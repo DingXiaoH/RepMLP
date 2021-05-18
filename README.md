@@ -106,8 +106,7 @@ My open-sourced papers and repos:
 
 The **Structural Re-parameterization Universe**:
 
-(preprint, 2021) **A powerful MLP-style CNN building block**: [RepMLP: Re-parameterizing Convolutions into Fully-connected Layers for Image Recognition](https://arxiv.org/abs/2105.01883)
-  [code](https://github.com/DingXiaoH/RepMLP).
+(preprint, 2021) **A powerful MLP-style CNN building block**: [RepMLP: Re-parameterizing Convolutions into Fully-connected Layers for Image Recognition](https://arxiv.org/abs/2105.01883)\[code](https://github.com/DingXiaoH/RepMLP).
 
 (CVPR 2021) **A super simple and powerful VGG-style ConvNet architecture**. Up to **83.55%** ImageNet top-1 accuracy! [RepVGG: Making VGG-style ConvNets Great Again](https://arxiv.org/abs/2101.03697)
   [code](https://github.com/DingXiaoH/RepVGG).
