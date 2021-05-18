@@ -2,6 +2,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+def fuse_bn(conv_or_fc, bn):
+    std = (bn.running_var + bn.eps).sqrt()
+    t = bn.weight / std
+    if conv_or_fc.weight.ndim == 4:
+        t = t.reshape(-1, 1, 1, 1)
+    else:
+        t = t.reshape(-1, 1)
+    return conv_or_fc.weight * t, bn.bias - bn.running_mean * bn.weight / std
+
 
 class RepMLP(nn.Module):
 
@@ -92,39 +101,26 @@ class RepMLP(nn.Module):
 
         fc3_out = fc3_out.permute(0, 3, 1, 4, 2, 5)  # N, O, h_parts, out_h, w_parts, out_w
         out = fc3_out.reshape(*self.target_shape)
-
         return out
 
-
-
     def _convert_conv_to_fc(self, conv_kernel, conv_bias):
-        I = torch.eye(self.C * self.h * self.w // self.fc3_groups).repeat(1, self.fc3_groups).reshape(self.C * self.h * self.w // self.fc3_groups, self.C, self.h, self.w).to(conv_kernel.device) 
+        I = torch.eye(self.C * self.h * self.w // self.fc3_groups).repeat(1, self.fc3_groups).reshape(self.C * self.h * self.w // self.fc3_groups, self.C, self.h, self.w).to(conv_kernel.device)
         fc_k = F.conv2d(I, conv_kernel, padding=conv_kernel.size(2)//2, groups=self.fc3_groups)
         fc_k = fc_k.reshape(self.O * self.h * self.w // self.fc3_groups, self.C * self.h * self.w).t()
         fc_bias = conv_bias.repeat_interleave(self.h * self.w)
         return fc_k, fc_bias
 
-    def _fuse_bn(self, conv_or_fc, bn):
-        std = (bn.running_var + bn.eps).sqrt()
-        t = bn.weight / std
-        if conv_or_fc.weight.ndim == 4:
-            t = t.reshape(-1, 1, 1, 1)
-        else:
-            t = t.reshape(-1, 1)
-        return conv_or_fc.weight * t, bn.bias - bn.running_mean * bn.weight / std
-
-
     def get_equivalent_fc1_fc3_params(self):
-        fc_weight, fc_bias = self._fuse_bn(self.fc3, self.fc3_bn)
+        fc_weight, fc_bias = fuse_bn(self.fc3, self.fc3_bn)
 
         if self.reparam_conv_k is not None:
             largest_k = max(self.reparam_conv_k)
             largest_branch = self.__getattr__('repconv{}'.format(largest_k))
-            total_kernel, total_bias = self._fuse_bn(largest_branch.conv, largest_branch.bn)
+            total_kernel, total_bias = fuse_bn(largest_branch.conv, largest_branch.bn)
             for k in self.reparam_conv_k:
                 if k != largest_k:
                     k_branch = self.__getattr__('repconv{}'.format(k))
-                    kernel, bias = self._fuse_bn(k_branch.conv, k_branch.bn)
+                    kernel, bias = fuse_bn(k_branch.conv, k_branch.bn)
                     total_kernel += F.pad(kernel, [(largest_k - k) // 2] * 4)
                     total_bias += bias
 
@@ -189,7 +185,6 @@ if __name__ == '__main__':
     O = 8
     groups = 4
 
-
     x = torch.randn(N, C, H, W)
     print('input shape is ', x.size())
     repmlp = RepMLP(C, O, H=H, W=W, h=h, w=w, reparam_conv_k=(1,3,5), fc1_fc2_reduction=1, fc3_groups=groups, deploy=False)
@@ -209,5 +204,3 @@ if __name__ == '__main__':
 
     print('difference between the outputs of the training-time and converted RepMLP is')
     print(((deployout - out) ** 2).sum())
-
-
