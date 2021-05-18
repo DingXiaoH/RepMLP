@@ -33,7 +33,7 @@ The definition of the two block structures (RepMLP Bottleneck and RepMLP Light) 
 
 # Use our pre-trained models
 
-You may download (Google Drive or Baidu Cloud, coming soon) and test our pre-trained models. 
+You may download our pre-trained models from Google Drive () or [Baidu Cloud](https://pan.baidu.com/s/14tGRpKT_WohX7UBcnWH6Zg) (the access key of Baidu is "rmlp").
 ```
 python test.py [imagenet-folder] train RepMLP-Res50-light-224_train.pth -a RepMLP-Res50-light-224
 ```
