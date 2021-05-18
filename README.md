@@ -1,16 +1,13 @@
 # RepMLP: Re-parameterizing Convolutions into Fully-connected Layers for Image Recognition (PyTorch)
 
-Released the code of RepMLP together with an 
-
-Just check it by
-
+Paper: https://arxiv.org/abs/2105.01883
 
 Citation:
 
-    @article{ding2021repvgg,
-    title={RepVGG: Making VGG-style ConvNets Great Again},
-    author={Ding, Xiaohan and Zhang, Xiangyu and Ma, Ningning and Han, Jungong and Ding, Guiguang and Sun, Jian},
-    journal={arXiv preprint arXiv:2101.03697},
+    @article{ding2021repmlp,
+    title={RepMLP: Re-parameterizing Convolutions into Fully-connected Layers for Image Recognition},
+    author={Ding, Xiaohan and Zhang, Xiangyu and Han, Jungong and Ding, Guiguang},
+    journal={arXiv preprint arXiv:2105.01883},
     year={2021}
     }
 
@@ -57,8 +54,6 @@ We propose RepMLP, a multi-layer-perceptron-style neural network building block 
 
 
 
-
-
 # FAQs
 
 **Q**: Is the inference-time model's output the _same_ as the training-time model?
@@ -70,7 +65,7 @@ python repmlp.py
 
 **Q**: How to use RepMLP for other tasks?
 
-**A**: It is better to finetune the training-time RepVGG models on your datasets. Then you should do the conversion after finetuning and before you deploy the models. For example, say you want to use RepMLP-Res50 and PSPNet for semantic segmentation, you should build a PSPNet with a training-time RepMLP-Res50 as the backbone, load pre-trained weights into the backbone, and finetune the PSPNet on your segmentation dataset. Then you should convert the backbone following the code provided in this repo and keep the other task-specific structures (the PSPNet parts, in this case). The pseudo code will be like
+**A**: It is better to finetune the training-time model on your datasets. Then you should do the conversion after finetuning and before you deploy the models. For example, say you want to use RepMLP-Res50 and PSPNet for semantic segmentation, you should build a PSPNet with a training-time RepMLP-Res50 as the backbone, load pre-trained weights into the backbone, and finetune the PSPNet on your segmentation dataset. Then you should convert the backbone following the code provided in this repo and keep the other task-specific structures (the PSPNet parts, in this case). The pseudo code will be like
 ```
 #   train_backbone = create_xxx(deploy=False)
 #   train_backbone.load_state_dict(torch.load(...))
@@ -109,11 +104,19 @@ Google Scholar Profile: https://scholar.google.com/citations?user=CIjw0KoAAAAJ&h
 
 My open-sourced papers and repos: 
 
-**Simple and powerful VGG-style ConvNet architecture** (preprint, 2021): [RepVGG: Making VGG-style ConvNets Great Again](https://arxiv.org/abs/2101.03697)      (https://github.com/DingXiaoH/RepVGG)
+The **Structural Re-parameterization Universe**:
 
-**State-of-the-art** channel pruning (preprint, 2020): [Lossless CNN Channel Pruning via Decoupling Remembering and Forgetting](https://arxiv.org/abs/2007.03260) (https://github.com/DingXiaoH/ResRep)
+**A powerful MLP-style CNN building block** (preprint, 2021): [RepMLP: Re-parameterizing Convolutions into Fully-connected Layers for Image Recognition](https://arxiv.org/abs/2105.01883), [code](https://github.com/DingXiaoH/RepMLP).
 
-CNN component (ICCV 2019): [ACNet: Strengthening the Kernel Skeletons for Powerful CNN via Asymmetric Convolution Blocks](http://openaccess.thecvf.com/content_ICCV_2019/papers/Ding_ACNet_Strengthening_the_Kernel_Skeletons_for_Powerful_CNN_via_Asymmetric_ICCV_2019_paper.pdf) (https://github.com/DingXiaoH/ACNet)
+**A super simple and powerful VGG-style ConvNet architecture** (CVPR 2021). Up to **83.55%** ImageNet top-1 accuracy! [RepVGG: Making VGG-style ConvNets Great Again](https://arxiv.org/abs/2101.03697), [code](https://github.com/DingXiaoH/RepVGG).
+
+**State-of-the-art** channel pruning (preprint, 2020): [Lossless CNN Channel Pruning via Decoupling Remembering and Forgetting](https://arxiv.org/abs/2007.03260) , [code](https://github.com/DingXiaoH/ResRep).
+
+ACB is a CNN component without any inference-time costs (ICCV 2019): [ACNet: Strengthening the Kernel Skeletons for Powerful CNN via Asymmetric Convolution Blocks](http://openaccess.thecvf.com/content_ICCV_2019/papers/Ding_ACNet_Strengthening_the_Kernel_Skeletons_for_Powerful_CNN_via_Asymmetric_ICCV_2019_paper.pdf) , [code](https://github.com/DingXiaoH/ACNet). The first work of our Structural Re-parameterization Universe.
+
+DBB is a CNN component with higher performance than ACB and still no inference-time costs. Sometimes I call it ACNet v2 because "DBB" is 2 bits larger than "ACB" in ASCII (lol). [Diverse Branch Block: Building a Convolution as an Inception-like Unit](https://arxiv.org/abs/2103.13425), [code](https://github.com/DingXiaoH/DiverseBranchBlock).
+
+Model compression and acceleration:
 
 Channel pruning (CVPR 2019): [Centripetal SGD for Pruning Very Deep Convolutional Networks with Complicated Structure](http://openaccess.thecvf.com/content_CVPR_2019/html/Ding_Centripetal_SGD_for_Pruning_Very_Deep_Convolutional_Networks_With_Complicated_CVPR_2019_paper.html) (https://github.com/DingXiaoH/Centripetal-SGD)
 
