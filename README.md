@@ -106,28 +106,33 @@ My open-sourced papers and repos:
 
 The **Structural Re-parameterization Universe**:
 
-(preprint, 2021) **A powerful MLP-style CNN building block**: [RepMLP: Re-parameterizing Convolutions into Fully-connected Layers for Image Recognition](https://arxiv.org/abs/2105.01883)\
+(preprint, 2021) **A powerful MLP-style CNN building block**\
+[RepMLP: Re-parameterizing Convolutions into Fully-connected Layers for Image Recognition](https://arxiv.org/abs/2105.01883)\
 [code](https://github.com/DingXiaoH/RepMLP).
 
-(CVPR 2021) **A super simple and powerful VGG-style ConvNet architecture**. Up to **83.55%** ImageNet top-1 accuracy! [RepVGG: Making VGG-style ConvNets Great Again](https://arxiv.org/abs/2101.03697)
-\[code](https://github.com/DingXiaoH/RepVGG).
+(CVPR 2021) **A super simple and powerful VGG-style ConvNet architecture**. Up to **83.55%** ImageNet top-1 accuracy!\
+[RepVGG: Making VGG-style ConvNets Great Again](https://arxiv.org/abs/2101.03697)\
+[code](https://github.com/DingXiaoH/RepVGG).
 
-(preprint, 2020) **State-of-the-art** channel pruning: [Lossless CNN Channel Pruning via Decoupling Remembering and Forgetting](https://arxiv.org/abs/2007.03260)
-  [code](https://github.com/DingXiaoH/ResRep).
+(preprint, 2020) **State-of-the-art** channel pruning\
+[Lossless CNN Channel Pruning via Decoupling Remembering and Forgetting](https://arxiv.org/abs/2007.03260)\
+[code](https://github.com/DingXiaoH/ResRep).
 
-ACB (ICCV 2019) is a CNN component without any inference-time costs: [ACNet: Strengthening the Kernel Skeletons for Powerful CNN via Asymmetric Convolution Blocks](http://openaccess.thecvf.com/content_ICCV_2019/papers/Ding_ACNet_Strengthening_the_Kernel_Skeletons_for_Powerful_CNN_via_Asymmetric_ICCV_2019_paper.pdf). The first work of our Structural Re-parameterization Universe.
-  [code](https://github.com/DingXiaoH/ACNet). 
+ACB (ICCV 2019) is a CNN component without any inference-time costs. The first work of our Structural Re-parameterization Universe.\
+[ACNet: Strengthening the Kernel Skeletons for Powerful CNN via Asymmetric Convolution Blocks](http://openaccess.thecvf.com/content_ICCV_2019/papers/Ding_ACNet_Strengthening_the_Kernel_Skeletons_for_Powerful_CNN_via_Asymmetric_ICCV_2019_paper.pdf).\
+[code](https://github.com/DingXiaoH/ACNet). 
 
-DBB (CVPR 2021) is a CNN component with higher performance than ACB and still no inference-time costs. Sometimes I call it ACNet v2 because "DBB" is 2 bits larger than "ACB" in ASCII (lol). [Diverse Branch Block: Building a Convolution as an Inception-like Unit](https://arxiv.org/abs/2103.13425)
-  [code](https://github.com/DingXiaoH/DiverseBranchBlock).
+DBB (CVPR 2021) is a CNN component with higher performance than ACB and still no inference-time costs. Sometimes I call it ACNet v2 because "DBB" is 2 bits larger than "ACB" in ASCII (lol).\
+[Diverse Branch Block: Building a Convolution as an Inception-like Unit](https://arxiv.org/abs/2103.13425)\
+[code](https://github.com/DingXiaoH/DiverseBranchBlock).
 
 **Model compression and acceleration**:
 
-(CVPR 2019) Channel pruning: [Centripetal SGD for Pruning Very Deep Convolutional Networks with Complicated Structure](http://openaccess.thecvf.com/content_CVPR_2019/html/Ding_Centripetal_SGD_for_Pruning_Very_Deep_Convolutional_Networks_With_Complicated_CVPR_2019_paper.html)
-  [code](https://github.com/DingXiaoH/Centripetal-SGD)
+(CVPR 2019) Channel pruning: [Centripetal SGD for Pruning Very Deep Convolutional Networks with Complicated Structure](http://openaccess.thecvf.com/content_CVPR_2019/html/Ding_Centripetal_SGD_for_Pruning_Very_Deep_Convolutional_Networks_With_Complicated_CVPR_2019_paper.html)\
+[code](https://github.com/DingXiaoH/Centripetal-SGD)
 
-(ICML 2019) Channel pruning: [Approximated Oracle Filter Pruning for Destructive CNN Width Optimization](http://proceedings.mlr.press/v97/ding19a.html)
-  [code](https://github.com/DingXiaoH/AOFP)
+(ICML 2019) Channel pruning: [Approximated Oracle Filter Pruning for Destructive CNN Width Optimization](http://proceedings.mlr.press/v97/ding19a.html)\
+[code](https://github.com/DingXiaoH/AOFP)
 
-(NeurIPS 2019) Unstructured pruning: [Global Sparse Momentum SGD for Pruning Very Deep Neural Networks](http://papers.nips.cc/paper/8867-global-sparse-momentum-sgd-for-pruning-very-deep-neural-networks.pdf)
-  [code](https://github.com/DingXiaoH/GSM-SGD)
+(NeurIPS 2019) Unstructured pruning: [Global Sparse Momentum SGD for Pruning Very Deep Neural Networks](http://papers.nips.cc/paper/8867-global-sparse-momentum-sgd-for-pruning-very-deep-neural-networks.pdf)\
+[code](https://github.com/DingXiaoH/GSM-SGD)
