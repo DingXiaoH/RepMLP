@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import copy
 
 def fuse_bn(conv_or_fc, bn):
     std = (bn.running_var + bn.eps).sqrt()
@@ -173,6 +174,16 @@ class RepMLP(nn.Module):
         self.fc3.weight.data = fc3_weight
         self.fc3.bias.data = fc3_bias
 
+
+def repmlp_model_convert(model:torch.nn.Module, save_path=None, do_copy=True):
+    if do_copy:
+        model = copy.deepcopy(model)
+    for module in model.modules():
+        if hasattr(module, 'switch_to_deploy'):
+            module.switch_to_deploy()
+    if save_path is not None:
+        torch.save(model.state_dict(), save_path)
+    return model
 
 
 if __name__ == '__main__':

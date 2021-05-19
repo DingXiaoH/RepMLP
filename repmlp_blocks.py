@@ -77,3 +77,42 @@ class RepMLPLightBlock(nn.Module):
         out += self.shortcut(x)
         out = self.relu(out)
         return out
+
+
+#   The input_ and output_channels of RepMLP are both mid_channels // r
+class RepMLPBottleneckBlock(nn.Module):
+
+    def __init__(self, in_channels, mid_channels, out_channels,
+                 r, H, W, h, w,
+                 reparam_conv_k,
+                 fc1_fc2_reduction,
+                 fc3_groups,
+                 deploy=False):
+        super(RepMLPBottleneckBlock, self).__init__()
+        if in_channels != out_channels:
+            self.shortcut = ConvBN(in_channels, out_channels, kernel_size=1, deploy=deploy)
+        else:
+            self.shortcut = nn.Identity()
+        repmlp_channels = mid_channels // r
+        self.btnk_conv1 = ConvBNReLU(in_channels, mid_channels, kernel_size=1, deploy=deploy)
+        self.btnk_conv2 = ConvBNReLU(mid_channels, repmlp_channels, kernel_size=3, padding=1, deploy=deploy)
+        self.btnk_repmlp = RepMLP(in_channels=repmlp_channels, out_channels=repmlp_channels,
+                                   H=H, W=W, h=h, w=w,
+                                   reparam_conv_k=reparam_conv_k, fc1_fc2_reduction=fc1_fc2_reduction,
+                                   fc3_groups=fc3_groups,
+                                   deploy=deploy)
+        self.repmlp_nonlinear = nn.ReLU()
+        self.btnk_conv4 = ConvBNReLU(repmlp_channels, mid_channels, kernel_size=3, padding=1, deploy=deploy)
+        self.btnk_conv5 = ConvBN(mid_channels, out_channels, kernel_size=1, deploy=deploy)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        out = self.btnk_conv1(x)
+        out = self.btnk_conv2(out)
+        out = self.btnk_repmlp(out)
+        out = self.repmlp_nonlinear(out)
+        out = self.btnk_conv4(out)
+        out = self.btnk_conv5(out)
+        out += self.shortcut(x)
+        out = self.relu(out)
+        return out

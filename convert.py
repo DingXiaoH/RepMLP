@@ -6,6 +6,7 @@ import torch.optim
 import torch.utils.data
 import torch.utils.data.distributed
 from repmlp_resnet import *
+from repmlp import repmlp_model_convert
 
 parser = argparse.ArgumentParser(description='RepVGG Conversion')
 parser.add_argument('load', metavar='LOAD', help='path to the weights file')

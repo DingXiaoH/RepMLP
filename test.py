@@ -33,11 +33,17 @@ def test():
     if args.arch == 'RepMLP-Res50-light-224':
         model = create_RepMLPRes50_Light_224(deploy=args.mode=='deploy')
     elif args.arch == 'RepMLP-Res50-bottleneck-224':
-        raise ValueError('TODO')
+        model = create_RepMLPRes50_Bottleneck_224(deploy=args.mode=='deploy')
     elif args.arch == 'RepMLP-Res50-bottleneck-320':
         raise ValueError('TODO')
     else:
         raise ValueError('not supported')
+
+    num_params = 0
+    for k, v in model.state_dict().items():
+        print(k, v.shape)
+        num_params += v.nelement()
+    print('total params: ', num_params)
 
     if not torch.cuda.is_available():
         print('using CPU, this will be slow')

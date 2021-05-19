@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from repmlp_blocks import ConvBNReLU, ConvBN, RepMLPLightBlock
-import copy
+from repmlp_blocks import ConvBNReLU, ConvBN, RepMLPLightBlock, RepMLPBottleneckBlock
 
 #   RepMLP: Re-parameterizing Convolutions into Fully-connected Layers for Image Recognition
 #   Paper:  https://arxiv.org/abs/2105.01883
@@ -33,7 +32,8 @@ class BaseBlock(nn.Module):
 class RepMLPResNet(nn.Module):
     def __init__(self, num_blocks, num_classes, block_type, img_H, img_W,
                  h, w, reparam_conv_k, fc1_fc2_reduction,
-                 fc3_groups, deploy=False
+                 fc3_groups, deploy=False,
+                 bottleneck_r=(2,4),        # r=2 for stage2 and r=4 for stage3
                  ):
         super(RepMLPResNet, self).__init__()
 
@@ -51,6 +51,7 @@ class RepMLPResNet(nn.Module):
         self.reparam_conv_k = reparam_conv_k
         self.fc1_fc2_reduction = fc1_fc2_reduction
         self.fc3_groups = fc3_groups
+        self.bottleneck_r = bottleneck_r
 
         self.in_channels = 64
         channels = [256, 512, 1024, 2048]
@@ -88,7 +89,14 @@ class RepMLPResNet(nn.Module):
                                              h=self.h, w=self.w, reparam_conv_k=self.reparam_conv_k, fc1_fc2_reduction=self.fc1_fc2_reduction,
                                              fc3_groups=self.fc3_groups, deploy=self.deploy)
             elif self.block_type == 'bottleneck':
-                raise ValueError('TODO')
+                cur_block = RepMLPBottleneckBlock(in_channels=self.in_channels, mid_channels=channels // 4,
+                                             out_channels=channels,
+                                             r = self.bottleneck_r[0] if total_downsample_ratio == 8 else self.bottleneck_r[1],
+                                             H=self.img_H // total_downsample_ratio,
+                                             W=self.img_W // total_downsample_ratio,
+                                             h=self.h, w=self.w, reparam_conv_k=self.reparam_conv_k,
+                                             fc1_fc2_reduction=self.fc1_fc2_reduction,
+                                             fc3_groups=self.fc3_groups, deploy=self.deploy)
             else:
                 raise ValueError('Not supported.')
 
@@ -98,17 +106,10 @@ class RepMLPResNet(nn.Module):
         return nn.Sequential(*blocks)
 
 
-def repmlp_model_convert(model:torch.nn.Module, save_path=None, do_copy=True):
-    if do_copy:
-        model = copy.deepcopy(model)
-    for module in model.modules():
-        if hasattr(module, 'switch_to_deploy'):
-            module.switch_to_deploy()
-    if save_path is not None:
-        torch.save(model.state_dict(), save_path)
-    return model
-
 
 def create_RepMLPRes50_Light_224(deploy):
     return RepMLPResNet(num_blocks=[3,4,6,3], num_classes=1000, block_type='light', img_H=224, img_W=224,
                         h=7, w=7, reparam_conv_k=(1,3,5), fc1_fc2_reduction=1, fc3_groups=4, deploy=deploy)
+def create_RepMLPRes50_Bottleneck_224(deploy):
+    return RepMLPResNet(num_blocks=[3,4,6,3], num_classes=1000, block_type='bottleneck', img_H=224, img_W=224,
+                        h=7, w=7, reparam_conv_k=(1,3,5), fc1_fc2_reduction=1, fc3_groups=8, deploy=deploy, bottleneck_r=(2,4))
