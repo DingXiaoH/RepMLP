@@ -58,6 +58,7 @@ class RepMLP(nn.Module):
                 self.avg.add_module('bn', nn.BatchNorm2d(num_features=self.C))
 
         self.fc3 = nn.Conv2d(self.C * self.h * self.w, self.O * self.h * self.w, 1, 1, 0, bias=deploy, groups=fc3_groups)
+        nn.init.orthogonal_(self.fc3.weight)
         self.fc3_bn = nn.Identity() if deploy else nn.BatchNorm1d(self.O * self.h * self.w)
 
         self.reparam_conv_k = reparam_conv_k
