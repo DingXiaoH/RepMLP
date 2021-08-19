@@ -106,9 +106,7 @@ class RepMLPResNet(nn.Module):
         return nn.Sequential(*blocks)
 
 
-def create_RepMLPRes50_Base_224(deploy):
-    return RepMLPResNet(num_blocks=[3,4,6,3], num_classes=1000, block_type='base', img_H=224, img_W=224,
-                        h=7, w=7, reparam_conv_k=(1,3,5), fc1_fc2_reduction=1, fc3_groups=4, deploy=deploy)
+
 def create_RepMLPRes50_Light_224(deploy):
     return RepMLPResNet(num_blocks=[3,4,6,3], num_classes=1000, block_type='light', img_H=224, img_W=224,
                         h=7, w=7, reparam_conv_k=(1,3,5), fc1_fc2_reduction=1, fc3_groups=4, deploy=deploy)
