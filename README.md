@@ -6,7 +6,7 @@ Citation:
 
     @article{ding2021repmlp,
     title={RepMLP: Re-parameterizing Convolutions into Fully-connected Layers for Image Recognition},
-    author={Ding, Xiaohan and Zhang, Xiangyu and Han, Jungong and Ding, Guiguang},
+    author={Ding, Xiaohan and Xia, Chunlong and Zhang, Xiangyu and Chu, Xiaojie and Han, Jungong and Ding, Guiguang},
     journal={arXiv preprint arXiv:2105.01883},
     year={2021}
     }
