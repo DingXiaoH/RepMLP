@@ -1,8 +1,12 @@
-# RepMLP: Re-parameterizing Convolutions into Fully-connected Layers for Image Recognition (PyTorch)
+# RepMLPNet: Hierarchical Vision MLP with Re-parameterized Locality (PyTorch)
 
-Paper: https://arxiv.org/abs/2105.01883
+The latest paper will be released on arXiv in two days.
 
-Citation:
+Old version: https://arxiv.org/abs/2105.01883
+
+Compared to the old version, this paper is a completely new one. We no longer uses RepMLP Block as a plug-in component in traditional ConvNets. Instead, we build an MLP architecture with RepMLP Block with a hierarchical design. RepMLPNet shows a favorable trade-off, compared to the other vision MLP models including ResMLP, gMLP, S2-MLP, etc.
+
+Citation (will be updated in 2 days):
 
     @article{ding2021repmlp,
     title={RepMLP: Re-parameterizing Convolutions into Fully-connected Layers for Image Recognition},
@@ -11,6 +15,7 @@ Citation:
     year={2021}
     }
 
+Will update this whole repo in 2 days.
 
 # How to use the code
 
