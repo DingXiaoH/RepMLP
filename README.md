@@ -1,10 +1,12 @@
 # RepMLPNet: Hierarchical Vision MLP with Re-parameterized Locality (PyTorch)
 
-The latest paper will be released on arXiv in two days.
+The latest version: https://arxiv.org/abs/2112.11081
+
+Compared to the old version, we no longer use RepMLP Block as a plug-in component in traditional ConvNets. Instead, we build an MLP architecture with RepMLP Block with a hierarchical design. RepMLPNet shows a favorable trade-off, compared to the other vision MLP models including ResMLP, gMLP, S2-MLP, etc.
+
+The overlap between the two versions is the Structural Re-parameterization method (Localtiy Injection) that equivalently merges conv into FC.
 
 Old version: https://arxiv.org/abs/2105.01883
-
-Compared to the old version, this paper is a completely new one. We no longer uses RepMLP Block as a plug-in component in traditional ConvNets. Instead, we build an MLP architecture with RepMLP Block with a hierarchical design. RepMLPNet shows a favorable trade-off, compared to the other vision MLP models including ResMLP, gMLP, S2-MLP, etc.
 
 Citation (will be updated in 2 days):
 
