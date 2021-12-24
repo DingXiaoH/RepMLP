@@ -12,7 +12,7 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 from utils import accuracy, ProgressMeter, AverageMeter, load_checkpoint
 import PIL
-from repmlpnet import create_RepMLPNet_B224
+from repmlpnet import *
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Test')
 parser.add_argument('data', metavar='DATA', help='path to dataset')
@@ -32,6 +32,8 @@ def test():
     args = parser.parse_args()
     if args.arch == 'RepMLPNet-B224':
         model = create_RepMLPNet_B224(deploy=args.mode == 'deploy')
+    elif args.arch == 'RepMLPNet-B256':
+        model = create_RepMLPNet_B256(deploy=args.mode == 'deploy')
     else:
         raise ValueError('TODO')
 
@@ -62,16 +64,16 @@ def test():
     # Data loading code
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
-    if args.resolution == 224:
+    if args.resolution <= 224:
         trans = transforms.Compose([
-            transforms.Resize((256, 256)),
-            transforms.CenterCrop(224),
+            transforms.Resize((256, 256), interpolation=PIL.Image.BILINEAR),    #   Resize to 256x256 then crop
+            transforms.CenterCrop(args.resolution),
             transforms.ToTensor(),
             normalize,
         ])
     else:
         trans = transforms.Compose([
-            transforms.Resize(args.resolution, interpolation=PIL.Image.BILINEAR),
+            transforms.Resize(256 * args.resolution // 224, interpolation=PIL.Image.BILINEAR),  #   Resize to a fixed shorter side length. This usually works better
             transforms.CenterCrop(args.resolution),
             transforms.ToTensor(),
             normalize,

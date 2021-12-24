@@ -275,6 +275,10 @@ def create_RepMLPNet_B224(deploy=False):
     return RepMLPNet(channels=(96, 192, 384, 768), hs=(56,28,14,7), ws=(56,28,14,7),
                       num_blocks=(2,2,12,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,32,128),
                      deploy=deploy)
+def create_RepMLPNet_B256(deploy=False):
+    return RepMLPNet(channels=(96, 192, 384, 768), hs=(64,32,16,8), ws=(64,32,16,8),
+                      num_blocks=(2,2,12,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,32,128),
+                     deploy=deploy)
 
 
 
@@ -286,7 +290,7 @@ if __name__ == '__main__':
     x = torch.randn(1, 3, 224, 224)
     origin_y = model(x)
 
-    model.locality_inject()
+    model.locality_injection()
 
     print(model)
     new_y = model(x)

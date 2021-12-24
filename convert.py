@@ -13,6 +13,8 @@ def convert():
 
     if args.arch == 'RepMLPNet-B224':
         model = create_RepMLPNet_B224(deploy=False)
+    elif args.arch == 'RepMLPNet-B256':
+        model = create_RepMLPNet_B256(deploy=False)
     else:
         raise ValueError('TODO')
 
