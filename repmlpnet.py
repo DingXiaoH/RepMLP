@@ -6,23 +6,20 @@
 #   https://github.com/DingXiaoH/RepMLP
 # --------------------------------------------------------
 
-
 import torch.nn.functional as F
 import torch.nn as nn
 import torch.utils.checkpoint as checkpoint
 import torch
 
-
-def conv_bn(in_channels, out_channels, kernel_size, stride, padding, groups=1, deploy=False):
+def conv_bn(in_channels, out_channels, kernel_size, stride, padding, groups=1):
     result = nn.Sequential()
     result.add_module('conv', nn.Conv2d(in_channels=in_channels, out_channels=out_channels,
-                                                  kernel_size=kernel_size, stride=stride, padding=padding, groups=groups, bias=deploy))
-    if not deploy:
-        result.add_module('bn', nn.BatchNorm2d(num_features=out_channels))
+                                                  kernel_size=kernel_size, stride=stride, padding=padding, groups=groups, bias=False))
+    result.add_module('bn', nn.BatchNorm2d(num_features=out_channels))
     return result
 
-def conv_bn_relu(in_channels, out_channels, kernel_size, stride, padding, groups=1, deploy=False):
-    result = conv_bn(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, stride=stride, padding=padding, groups=groups, deploy=deploy)
+def conv_bn_relu(in_channels, out_channels, kernel_size, stride, padding, groups=1):
+    result = conv_bn(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, stride=stride, padding=padding, groups=groups)
     result.add_module('relu', nn.ReLU())
     return result
 
@@ -87,7 +84,7 @@ class RepMLPBlock(nn.Module):
         self.reparam_conv_k = reparam_conv_k
         if not deploy and reparam_conv_k is not None:
             for k in reparam_conv_k:
-                conv_branch = conv_bn(num_sharesets, num_sharesets, kernel_size=k, stride=1, padding=k//2, groups=num_sharesets, deploy=False)
+                conv_branch = conv_bn(num_sharesets, num_sharesets, kernel_size=k, stride=1, padding=k//2, groups=num_sharesets)
                 self.__setattr__('repconv{}'.format(k), conv_branch)
 
 
@@ -153,7 +150,7 @@ class RepMLPBlock(nn.Module):
             final_fc3_bias = fc_bias
         return final_fc3_weight, final_fc3_bias
 
-    def switch_to_deploy(self):
+    def local_inject(self):
         self.deploy = True
         #   Locality Injection
         fc3_weight, fc3_bias = self.get_equivalent_fc3()
@@ -178,16 +175,12 @@ class RepMLPBlock(nn.Module):
 
 #   The common FFN Block used in many Transformer and MLP models.
 class FFNBlock(nn.Module):
-    def __init__(self, in_channels, hidden_channels=None, out_channels=None, act_layer=nn.GELU, deploy=False):
+    def __init__(self, in_channels, hidden_channels=None, out_channels=None, act_layer=nn.GELU):
         super().__init__()
         out_features = out_channels or in_channels
         hidden_features = hidden_channels or in_channels
-        if deploy:
-            self.ffn_fc1 = nn.Conv2d(in_channels, hidden_features, 1, 1, 0)
-            self.ffn_fc2 = nn.Conv2d(hidden_features, out_features, 1, 1, 0)
-        else:
-            self.ffn_fc1 = conv_bn(in_channels, hidden_features, 1, 1, 0)
-            self.ffn_fc2 = conv_bn(hidden_features, out_features, 1, 1, 0)
+        self.ffn_fc1 = conv_bn(in_channels, hidden_features, 1, 1, 0)
+        self.ffn_fc2 = conv_bn(hidden_features, out_features, 1, 1, 0)
         self.act = act_layer()
 
     def forward(self, x):
@@ -205,7 +198,7 @@ class RepMLPNetUnit(nn.Module):
         self.repmlp_block = RepMLPBlock(in_channels=channels, out_channels=channels, h=h, w=w,
                                         reparam_conv_k=reparam_conv_k, globalperceptron_reduce=globalperceptron_reduce,
                                         num_sharesets=num_sharesets, deploy=deploy)
-        self.ffn_block = FFNBlock(channels, channels * ffn_expand, deploy=deploy)
+        self.ffn_block = FFNBlock(channels, channels * ffn_expand)
         self.prebn1 = nn.BatchNorm2d(channels)
         self.prebn2 = nn.BatchNorm2d(channels)
 
@@ -233,7 +226,7 @@ class RepMLPNet(nn.Module):
         assert num_stages == len(ws)
         assert num_stages == len(sharesets_nums)
 
-        self.conv_embedding = conv_bn_relu(in_channels, channels[0], kernel_size=patch_size, stride=patch_size, padding=0, deploy=deploy)
+        self.conv_embedding = conv_bn_relu(in_channels, channels[0], kernel_size=patch_size, stride=patch_size, padding=0)
 
         stages = []
         embeds = []
@@ -243,7 +236,7 @@ class RepMLPNet(nn.Module):
                                             deploy=deploy) for _ in range(num_blocks[stage_idx])]
             stages.append(nn.ModuleList(stage_blocks))
             if stage_idx < num_stages - 1:
-                embeds.append(conv_bn_relu(in_channels=channels[stage_idx], out_channels=channels[stage_idx + 1], kernel_size=2, stride=2, padding=0, deploy=deploy))
+                embeds.append(conv_bn_relu(in_channels=channels[stage_idx], out_channels=channels[stage_idx + 1], kernel_size=2, stride=2, padding=0))
 
         self.stages = nn.ModuleList(stages)
         self.embeds = nn.ModuleList(embeds)
@@ -272,15 +265,16 @@ class RepMLPNet(nn.Module):
         x = self.head(x)
         return x
 
-    def locality_inject(self):
+    def locality_injection(self):
         for m in self.modules():
-            if hasattr(m, 'switch_to_deploy'):
-                m.switch_to_deploy()
+            if hasattr(m, 'local_inject'):
+                m.local_inject()
 
 
-def create_RepMLPNet_B224():
+def create_RepMLPNet_B224(deploy=False):
     return RepMLPNet(channels=(96, 192, 384, 768), hs=(56,28,14,7), ws=(56,28,14,7),
-                      num_blocks=(2,2,12,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,32,128))
+                      num_blocks=(2,2,12,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,32,128),
+                     deploy=deploy)
 
 
 

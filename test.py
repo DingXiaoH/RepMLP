@@ -31,7 +31,7 @@ parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
 def test():
     args = parser.parse_args()
     if args.arch == 'RepMLPNet-B224':
-        model = create_RepMLPNet_B224()
+        model = create_RepMLPNet_B224(deploy=args.mode == 'deploy')
     else:
         raise ValueError('TODO')
 
