@@ -2,9 +2,9 @@
 
 The latest version: https://arxiv.org/abs/2112.11081
 
-Compared to the old version, we no longer use RepMLP Block as a plug-in component in traditional ConvNets. Instead, we build an MLP architecture with RepMLP Block with a hierarchical design. RepMLPNet shows a favorable trade-off, compared to the other vision MLP models including ResMLP, gMLP, S2-MLP, etc.
+Compared to the old version, we no longer use RepMLP Block as a plug-in component in traditional ConvNets. Instead, we build an MLP architecture with RepMLP Block with a hierarchical design. RepMLPNet shows favorable performance, compared to the other vision MLP models including MLP-Mixer, ResMLP, gMLP, S2-MLP, etc.
 
-The overlap between the two versions is the Structural Re-parameterization method (Localtiy Injection) that equivalently merges conv into FC.
+The overlap between the two versions is the Structural Re-parameterization method (Localtiy Injection) that equivalently merges conv into FC. The architectural designs presented in the latest version significantly differ from the old version (ResNet-50 + RepMLP). 
 
 Old version: https://arxiv.org/abs/2105.01883
 
@@ -17,25 +17,24 @@ Citation (will be updated in 2 days):
     year={2021}
     }
 
-Will update this whole repo in 2 days.
 
 # How to use the code
 
-If you want to use RepMLP as a building block in your model, just check repmlp.py. It also shows an example of checking the equivalence between a training-time and an inference-time RepMLP. You can see that by
-```
-python repmlp.py
-```
-Just use it like this
-```
-from repmlp.py import *
-your_model = YourModel(...)   # It has RepMLPs somewhere
-train(your_model)
-deploy_model = repmlp_model_convert(your_model)
-test(deploy_model)
-```
-From ```repmlp_model_convert```, you will see that the conversion is as simple as calling **switch_to_deploy** of every RepMLP. 
+Please check ```repmlpnet.py``` for the definition of our models.
 
-The definition of the two block structures (RepMLP Bottleneck and RepMLP Light) are shown in ```repmlp_blocks.py```. The RepMLP-ResNet is defined in ```repmlp_resnet.py```.
+To conduct Locality Injection, just call ```locality_inject()``` of your model. It is as simple as callling ```locality_inject``` of every RepMLPBlock. We show an example in ```convert.py```.
+
+We also show an example of checking the equivalence of Locality Injection:
+```
+python repmlpnet.py
+```
+
+If you want to use RepMLP as a building block in your model, just check the definition of ```RepMLPBlock``` in  ```repmlpnet.py```. For the conversion, just call **locality_inject** of every RepMLPBlock:
+```
+        for m in your_model.modules():
+            if hasattr(m, 'locality_inject'):
+                m.locality_inject()
+```
 
 
 # Use our pre-trained models
