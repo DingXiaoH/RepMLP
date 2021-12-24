@@ -22,18 +22,18 @@ Citation (will be updated in 2 days):
 
 Please check ```repmlpnet.py``` for the definition of our models.
 
-To conduct Locality Injection, just call ```locality_inject()``` of your model. It is as simple as callling ```locality_inject``` of every RepMLPBlock. We show an example in ```convert.py```.
+To conduct Locality Injection, just call ```locality_injection()``` of a RepMLPNet. It is implemented by calling ```local_inject``` of every ```RepMLPBlock```. We show an example in ```convert.py```.
 
 We also show an example of checking the equivalence of Locality Injection:
 ```
 python repmlpnet.py
 ```
 
-If you want to use RepMLP as a building block in your model, just check the definition of ```RepMLPBlock``` in  ```repmlpnet.py```. For the conversion, just call **locality_inject** of every RepMLPBlock:
+If you want to use RepMLP as a building block in your model, just check the definition of ```RepMLPBlock``` in  ```repmlpnet.py```. For the conversion, just **call local_inject of every RepMLPBlock**:
 ```
         for m in your_model.modules():
-            if hasattr(m, 'locality_inject'):
-                m.locality_inject()
+            if hasattr(m, 'local_inject'):
+                m.local_inject()
 ```
 
 
