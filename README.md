@@ -41,14 +41,14 @@ If you want to use RepMLP as a building block in your model, just check the defi
 
 You may download our pre-trained models from [Google Drive](https://drive.google.com/drive/folders/1eDFunxOQ67MvBBmJ4Bw01TFh2YVNRrg2?usp=sharing) or [Baidu Cloud](https://pan.baidu.com/s/14tGRpKT_WohX7UBcnWH6Zg) (the access key of Baidu is "rmlp").
 ```
-python test.py [imagenet-folder] train RepMLP-Res50-light-224_train.pth -a RepMLP-Res50-light-224
+python test.py [imagenet-folder] train RepMLPNet-B256-train-acc8111.pth -a RepMLPNet-B256 -r 256
 ```
 Here ```imagenet-folder``` should contain the "train" and "val" folders. The default input resolution is 224x224. Here "train" indicates the training-time architecture.
 
-You may convert them into the inference-time structure and test again to check the equivalence. For example
+You may convert the training-time model into the inference-time structure via Locality Injection and test again to verify the equivalence. For example
 ```
-python convert.py RepMLP-Res50-light-224_train.pth RepMLP-Res50-light-224_deploy.pth -a RepMLP-Res50-light-224
-python test.py [imagenet-folder] deploy RepMLP-Res50-light-224_deploy.pth -a RepMLP-Res50-light-224
+python convert.py RepMLPNet-B256-train-acc8111.pth RepMLPNet-B256-deploy-acc8111.pth -a RepMLPNet-B256
+python test.py [imagenet-folder] deploy RepMLPNet-B256-deploy-acc8111.pth -a RepMLPNet-B256
 ```
 Now "deploy" indicates the inference-time structure (without Local Perceptron).
 
@@ -56,7 +56,7 @@ Now "deploy" indicates the inference-time structure (without Local Perceptron).
 
 # Abstract
 
-We propose RepMLP, a multi-layer-perceptron-style neural network building block for image recognition, which is composed of a series of fully-connected (FC) layers. Compared to convolutional layers, FC layers are more efficient, better at modeling the long-range dependencies and positional patterns, but worse at capturing the local structures, hence usually less favored for image recognition. We propose a structural re-parameterization technique that adds local prior into an FC to make it powerful for image recognition. Specifically, we construct convolutional layers inside a RepMLP during training and merge them into the FC for inference. On CIFAR, a simple pure-MLP model shows performance very close to CNN. By inserting RepMLP in traditional CNN, we improve ResNets by 1.8% accuracy on ImageNet, 2.9% for face recognition, and 2.3% mIoU on Cityscapes with lower FLOPs. Our intriguing findings highlight that combining the global representational capacity and positional perception of FC with the local prior of convolution can improve the performance of neural network with faster speed on both the tasks with translation invariance (e.g., semantic segmentation) and those with aligned images and positional patterns (e.g., face recognition).
+Compared to convolutional layers, fully-connected (FC) layers are better at modeling the long-range dependencies but worse at capturing the local patterns, hence usually less favored for image recognition. In this paper, we propose a methodology, Locality Injection, to incorporate local priors into an FC layer via merging the trained parameters of a parallel conv kernel into the FC kernel. Locality Injection can be viewed as a novel Structural Re-parameterization method since it equivalently converts the structures via transforming the parameters. Based on that, we propose a multi-layer-perceptron (MLP) block named RepMLP Block, which uses three FC layers to extract features, and a novel architecture named RepMLPNet. The hierarchical design distinguishes RepMLPNet from the other concurrently proposed vision MLPs. As it produces feature maps of different levels, it qualifies as a backbone model for downstream tasks like semantic segmentation. Our results reveal that 1) Locality Injection is a general methodology for MLP models; 2) RepMLPNet has favorable accuracy-efficiency trade-off compared to the other MLPs; 3) RepMLPNet is the first MLP that seamlessly transfer to Cityscapes semantic segmentation.
 
 
 
@@ -66,39 +66,41 @@ We propose RepMLP, a multi-layer-perceptron-style neural network building block 
 
 **A**: Yes. You can verify that by
 ```
-python repmlp.py
+python repmlpnet.py
 ```
 
-**Q**: How to use RepMLP for other tasks?
+**Q**: How to use RepMLPNet for other tasks?
 
-**A**: It is better to finetune the training-time model on your datasets. Then you should do the conversion after finetuning and before you deploy the models. For example, say you want to use RepMLP-Res50 and PSPNet for semantic segmentation, you should build a PSPNet with a training-time RepMLP-Res50 as the backbone, load pre-trained weights into the backbone, and finetune the PSPNet on your segmentation dataset. Then you should convert the backbone following the code provided in this repo and keep the other task-specific structures (the PSPNet parts, in this case). The pseudo code will be like
+**A**: It is better to finetune the training-time model on your datasets. Then you should do the conversion after finetuning and before you deploy the models. For example, say you want to use RepMLPNet and UperNet for semantic segmentation, you should build a UperNet with a training-time RepMLPNet as the backbone, load pre-trained weights into the backbone, and finetune the UperNet on your segmentation dataset. Then you should convert the backbone and keep the other structures. That will be as simple as
 ```
-#   train_backbone = create_xxx(deploy=False)
-#   train_backbone.load_state_dict(torch.load(...))
-#   train_pspnet = build_pspnet(backbone=train_backbone)
-#   segmentation_train(train_pspnet)
-#   deploy_pspnet = repmlp_model_convert(train_pspnet)
-#   segmentation_test(deploy_pspnet)
+        for m in your_upernet.modules():
+            if hasattr(m, 'local_inject'):
+                m.local_inject()
 ```
 
-Finetuning with a converted model also makes sense if you insert a BN after fc3, but the performance may be slightly lower.
+Finetuning with a converted RepMLPNet also makes sense, but the performance may be slightly lower.
 
 **Q**: How to quantize a model with RepMLP?
 
 **A1**: Post-training quantization. After training and conversion, you may quantize the converted model with any post-training quantization method. Then you may insert a BN after fc3 and finetune to recover the accuracy just like you quantize and finetune the other models. This is the recommended solution.
 
-**A2**: Quantization-aware training. During the quantization-aware training, instead of constraining the params in a single kernel (e.g., making every param in {-127, -126, .., 126, 127} for int8) for ordinary models, you should constrain the equivalent kernel (get_equivalent_fc1_fc3_params() in repmlp.py). 
+**A2**: Quantization-aware training. During the quantization-aware training, instead of constraining the params in a single kernel (e.g., making every param in {-127, -126, .., 126, 127} for int8) for ordinary models, you should constrain the equivalent kernel (get_equivalent_fc3() in repmlpnet.py). 
 
-**Q**: I tried to finetune your model with multiple GPUs but got an error. Why are the names of params like "stage1.0..." in the downloaded weight file but sometimes like "module.stage1.0..." (shown by nn.Module.named_parameters()) in my model?
+**Q**: I tried to finetune your model with multiple GPUs but got an error. Why are the names of params like "stages.0..." in the downloaded weights file but sometimes like "module.stages.0..." (shown by my_model.named_parameters()) in my model?
 
-**A**: DistributedDataParallel may prefix "module." to the name of params and cause a mismatch when loading weights by name. The simplest solution is to load the weights (model.load_state_dict(...)) before DistributedDataParallel(model). Otherwise, you may insert "module." before the names like this
+**A**: DistributedDataParallel may prefix "module." to the name of params and cause a mismatch when loading weights by name. The simplest solution is to load the weights (model.load_state_dict(...)) before DistributedDataParallel(model). Otherwise, you may A) insert "module." before the names like this
 ```
 checkpoint = torch.load(...)    # This is just a name-value dict
 ckpt = {('module.' + k) : v for k, v in checkpoint.items()}
 model.load_state_dict(ckpt)
 ```
+or load the weights into model.module
+```
+checkpoint = torch.load(...)    # This is just a name-value dict
+model.module.load_state_dict(ckpt)
+```
 
-**Q**: So a RepMLP derives the equivalent big fc kernel before each forwarding to save computations?
+**Q**: So a RepMLP Block derives the equivalent big fc kernel before each forwarding to save computations?
 
 **A**: No! More precisely, we do the conversion only once right after training. Then the training-time model can be discarded, and the resultant model has no conv branches. We only save and use the resultant model.
 
