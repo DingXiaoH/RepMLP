@@ -12,32 +12,28 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 from utils import accuracy, ProgressMeter, AverageMeter, load_checkpoint
 import PIL
-from repmlp_resnet import *
+from repmlpnet import create_RepMLPNet_B224
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Test')
-parser.add_argument('data', metavar='DIR', help='path to dataset')
+parser.add_argument('data', metavar='DATA', help='path to dataset')
 parser.add_argument('mode', metavar='MODE', default='train', choices=['train', 'deploy'], help='train or deploy')
 parser.add_argument('weights', metavar='WEIGHTS', help='path to the weights file')
-parser.add_argument('-a', '--arch', metavar='ARCH', default='RepMLP-Res50-light-224')
-parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
-                    help='number of data loading workers (default: 4)')
+parser.add_argument('-a', '--arch', metavar='ARCH', default='RepMLPNet-B224')
 parser.add_argument('-b', '--batch-size', default=100, type=int,
                     metavar='N',
                     help='mini-batch size (default: 100) for test')
 parser.add_argument('-r', '--resolution', default=224, type=int,
                     metavar='R',
                     help='resolution (default: 224) for test')
+parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
+                    help='number of data loading workers (default: 4)')
 
 def test():
     args = parser.parse_args()
-    if args.arch == 'RepMLP-Res50-light-224':
-        model = create_RepMLPRes50_Light_224(deploy=args.mode=='deploy')
-    elif args.arch == 'RepMLP-Res50-bottleneck-224':
-        model = create_RepMLPRes50_Bottleneck_224(deploy=args.mode=='deploy')
-    elif args.arch == 'RepMLP-Res50-bottleneck-320':
-        raise ValueError('TODO')
+    if args.arch == 'RepMLPNet-B224':
+        model = create_RepMLPNet_B224()
     else:
-        raise ValueError('not supported')
+        raise ValueError('TODO')
 
     num_params = 0
     for k, v in model.state_dict().items():
@@ -52,7 +48,7 @@ def test():
         model = model.cuda()
         use_gpu = True
 
-    # define loss function (criterion) and optimizer
+    # define loss function (criterion)
     criterion = nn.CrossEntropyLoss().cuda()
 
     if os.path.isfile(args.weights):
@@ -61,17 +57,14 @@ def test():
     else:
         print("=> no checkpoint found at '{}'".format(args.weights))
 
-
     cudnn.benchmark = True
 
     # Data loading code
-    valdir = os.path.join(args.data, 'val')
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
-
     if args.resolution == 224:
         trans = transforms.Compose([
-            transforms.Resize(256),
+            transforms.Resize((256, 256)),
             transforms.CenterCrop(224),
             transforms.ToTensor(),
             normalize,
@@ -82,10 +75,17 @@ def test():
             transforms.CenterCrop(args.resolution),
             transforms.ToTensor(),
             normalize,
-        ]
-        )
+        ])
 
-    val_dataset = datasets.ImageFolder(valdir, trans)
+
+    if os.path.exists('/home/dingxiaohan/ndp/imagenet.val.nori.list'):
+        #   This is the data source on our machine. For debugging only. You won't need it.
+        from noris_dataset import ImageNetNoriDataset
+        val_dataset = ImageNetNoriDataset('/home/dingxiaohan/ndp/imagenet.val.nori.list', trans)
+    else:
+        #   Your ImageNet directory
+        valdir = os.path.join(args.data, 'val')
+        val_dataset = datasets.ImageFolder(valdir, trans)
 
     val_loader = torch.utils.data.DataLoader(
         val_dataset,
