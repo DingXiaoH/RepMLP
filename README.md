@@ -48,7 +48,7 @@ Here ```imagenet-folder``` should contain the "train" and "val" folders. The def
 You may convert the training-time model into the inference-time structure via Locality Injection and test again to verify the equivalence. For example
 ```
 python convert.py RepMLPNet-B256-train-acc8111.pth RepMLPNet-B256-deploy-acc8111.pth -a RepMLPNet-B256
-python test.py [imagenet-folder] deploy RepMLPNet-B256-deploy-acc8111.pth -a RepMLPNet-B256
+python test.py [imagenet-folder] deploy RepMLPNet-B256-deploy-acc8111.pth -a RepMLPNet-B256 -r 256
 ```
 Now "deploy" indicates the inference-time structure (without Local Perceptron).
 
