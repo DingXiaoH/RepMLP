@@ -58,7 +58,11 @@ Now "deploy" indicates the inference-time structure (without Local Perceptron).
 
 Compared to convolutional layers, fully-connected (FC) layers are better at modeling the long-range dependencies but worse at capturing the local patterns, hence usually less favored for image recognition. In this paper, we propose a methodology, Locality Injection, to incorporate local priors into an FC layer via merging the trained parameters of a parallel conv kernel into the FC kernel. Locality Injection can be viewed as a novel Structural Re-parameterization method since it equivalently converts the structures via transforming the parameters. Based on that, we propose a multi-layer-perceptron (MLP) block named RepMLP Block, which uses three FC layers to extract features, and a novel architecture named RepMLPNet. The hierarchical design distinguishes RepMLPNet from the other concurrently proposed vision MLPs. As it produces feature maps of different levels, it qualifies as a backbone model for downstream tasks like semantic segmentation. Our results reveal that 1) Locality Injection is a general methodology for MLP models; 2) RepMLPNet has favorable accuracy-efficiency trade-off compared to the other MLPs; 3) RepMLPNet is the first MLP that seamlessly transfer to Cityscapes semantic segmentation.
 
+# TODO
 
+Release more model weights (in several days, I think)
+
+Training code (based on the code of Swin and DeiT)
 
 # FAQs
 
@@ -114,16 +118,16 @@ My open-sourced papers and repos:
 
 The **Structural Re-parameterization Universe**:
 
-1. (preprint, 2021) **A powerful MLP-style CNN building block**\
-[RepMLP: Re-parameterizing Convolutions into Fully-connected Layers for Image Recognition](https://arxiv.org/abs/2105.01883)\
+1. RepMLP (preprint, 2021) **MLP-style building block and Architecture**\
+[RepMLPNet: Hierarchical Vision MLP with Re-parameterized Locality](https://arxiv.org/abs/2112.11081)\
 [code](https://github.com/DingXiaoH/RepMLP).
 
-2. (CVPR 2021) **A super simple and powerful VGG-style ConvNet architecture**. Up to **83.55%** ImageNet top-1 accuracy!\
+2. RepVGG (CVPR 2021) **A super simple and powerful VGG-style ConvNet architecture**. Up to **84.16%** ImageNet top-1 accuracy!\
 [RepVGG: Making VGG-style ConvNets Great Again](https://arxiv.org/abs/2101.03697)\
 [code](https://github.com/DingXiaoH/RepVGG).
 
-3. (preprint, 2020) **State-of-the-art** channel pruning\
-[Lossless CNN Channel Pruning via Decoupling Remembering and Forgetting](https://arxiv.org/abs/2007.03260)\
+3. ResRep (ICCV 2021) **State-of-the-art** channel pruning (Res50, 55\% FLOPs reduction, 76.15\% acc)\
+[ResRep: Lossless CNN Pruning via Decoupling Remembering and Forgetting](https://openaccess.thecvf.com/content/ICCV2021/papers/Ding_ResRep_Lossless_CNN_Pruning_via_Decoupling_Remembering_and_Forgetting_ICCV_2021_paper.pdf)\
 [code](https://github.com/DingXiaoH/ResRep).
 
 4. ACB (ICCV 2019) is a CNN component without any inference-time costs. The first work of our Structural Re-parameterization Universe.\
@@ -133,6 +137,10 @@ The **Structural Re-parameterization Universe**:
 5. DBB (CVPR 2021) is a CNN component with higher performance than ACB and still no inference-time costs. Sometimes I call it ACNet v2 because "DBB" is 2 bits larger than "ACB" in ASCII (lol).\
 [Diverse Branch Block: Building a Convolution as an Inception-like Unit](https://arxiv.org/abs/2103.13425)\
 [code](https://github.com/DingXiaoH/DiverseBranchBlock).
+
+6. COMING SOON
+
+7. COMING SOON
 
 **Model compression and acceleration**:
 
