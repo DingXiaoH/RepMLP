@@ -10,10 +10,10 @@ Old version: https://arxiv.org/abs/2105.01883
 
 Citation (will be updated in 2 days):
 
-    @article{ding2021repmlp,
-    title={RepMLP: Re-parameterizing Convolutions into Fully-connected Layers for Image Recognition},
-    author={Ding, Xiaohan and Xia, Chunlong and Zhang, Xiangyu and Chu, Xiaojie and Han, Jungong and Ding, Guiguang},
-    journal={arXiv preprint arXiv:2105.01883},
+    @article{ding2021repmlpnet,
+    title={RepMLPNet: Hierarchical Vision MLP with Re-parameterized Locality},
+    author={Ding, Xiaohan and Chen, Honghao and Zhang, Xiangyu and Han, Jungong and Ding, Guiguang},
+    journal={arXiv preprint arXiv:2112.11081},
     year={2021}
     }
 
