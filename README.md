@@ -6,9 +6,7 @@ Compared to the old version, we no longer use RepMLP Block as a plug-in componen
 
 The overlap between the two versions is the Structural Re-parameterization method (Localtiy Injection) that equivalently merges conv into FC. The architectural designs presented in the latest version significantly differ from the old version (ResNet-50 + RepMLP). 
 
-Old version: https://arxiv.org/abs/2105.01883
-
-Citation (will be updated in 2 days):
+Citation:
 
     @article{ding2021repmlpnet,
     title={RepMLPNet: Hierarchical Vision MLP with Re-parameterized Locality},
@@ -17,6 +15,7 @@ Citation (will be updated in 2 days):
     year={2021}
     }
 
+Old version: https://arxiv.org/abs/2105.01883
 
 # How to use the code
 
