@@ -1,4 +1,6 @@
-# RepMLPNet: Hierarchical Vision MLP with Re-parameterized Locality (PyTorch)
+# RepMLPNet: Hierarchical Vision MLP with Re-parameterized Locality (PyTorch) (CVPR-2022)
+
+Accepted to CVPR-2022!
 
 The latest version: https://arxiv.org/abs/2112.11081
 
