@@ -55,6 +55,13 @@ python test.py [imagenet-folder] deploy RepMLPNet-B256-deploy-acc8111.pth -a Rep
 ```
 Now "deploy" indicates the inference-time structure (without Local Perceptron).
 
+# Train from scratch
+
+Use the training script (based on the script provided by Swin Transformer) to reproduce our results. For examples,
+```
+python3 -m torch.distributed.launch --nproc_per_node 8 --master_port 12349 main_repmlp.py --arch RepMLPNet-B256 --batch-size 32 --tag my_experiment --opts TRAIN.EPOCHS 100 TRAIN.BASE_LR 0.002 TRAIN.WEIGHT_DECAY 0.1 TRAIN.OPTIMIZER.NAME adamw TRAIN.OPTIMIZER.MOMENTUM 0.9 TRAIN.WARMUP_LR 5e-7 TRAIN.MIN_LR 0.0 TRAIN.WARMUP_EPOCHS 10 AUG.PRESET raug15 AUG.MIXUP 0.4 AUG.CUTMIX 1.0 TRAIN.EMA_ALPHA 1e-5 DATA.IMG_SIZE 256
+```
+so that the log and models will be saved to ```output/RepMLPNet-B256/my_experiment```.
 
 # Abstract
 
