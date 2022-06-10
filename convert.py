@@ -1,7 +1,7 @@
 import argparse
 import os
 import torch
-from repmlpnet import *
+from repmlpnet import get_RepMLPNet_model
 
 parser = argparse.ArgumentParser(description='RepMLPNet Conversion')
 parser.add_argument('load', metavar='LOAD', help='path to the source weights file')
@@ -10,13 +10,7 @@ parser.add_argument('-a', '--arch', metavar='ARCH', default='RepMLPNet-B224')
 
 def convert():
     args = parser.parse_args()
-
-    if args.arch == 'RepMLPNet-B224':
-        model = create_RepMLPNet_B224(deploy=False)
-    elif args.arch == 'RepMLPNet-B256':
-        model = create_RepMLPNet_B256(deploy=False)
-    else:
-        raise ValueError('TODO')
+    model = get_RepMLPNet_model(args.arch, deploy=False)
 
     if os.path.isfile(args.load):
         print("=> loading checkpoint '{}'".format(args.load))
@@ -29,13 +23,11 @@ def convert():
         print(ckpt.keys())
         model.load_state_dict(ckpt)
     else:
-        print("=> no checkpoint found at '{}'".format(args.load))
+        raise ValueError("=> no checkpoint found at '{}'".format(args.load))
 
     model.locality_injection()
 
     torch.save(model.state_dict(), args.save)
-
-
 
 if __name__ == '__main__':
     convert()

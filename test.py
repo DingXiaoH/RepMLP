@@ -17,13 +17,14 @@ import torch.utils.data
 import torch.utils.data.distributed
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
-from utils import accuracy, ProgressMeter, AverageMeter, load_checkpoint
-import PIL
+from utils import load_weights, ProgressMeter, AverageMeter
 from repmlpnet import get_RepMLPNet_model
+from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
+from timm.utils import accuracy
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Test')
 parser.add_argument('data', metavar='DATA', help='path to dataset')
-parser.add_argument('mode', metavar='MODE', default='train', choices=['train', 'deploy'], help='train or deploy')
+parser.add_argument('mode', metavar='MODE', default='train', choices=['train', 'deploy', 'check'], help='train, deploy, or check the equivalency?')
 parser.add_argument('weights', metavar='WEIGHTS', help='path to the weights file')
 parser.add_argument('-a', '--arch', metavar='ARCH', default='RepMLPNet-B224')
 parser.add_argument('-b', '--batch-size', default=100, type=int,
@@ -45,42 +46,31 @@ def test():
         num_params += v.nelement()
     print('total params: ', num_params)
 
+    if os.path.isfile(args.weights):
+        print("=> loading checkpoint '{}'".format(args.weights))
+        load_weights(model, args.weights)
+    else:
+        raise ValueError("=> no checkpoint found at '{}'".format(args.weights))
+
+    if args.mode == 'check':    # Note this. In "check" mode, we load the trained weights and convert afterwards.
+        model.locality_injection()
+
     if not torch.cuda.is_available():
-        print('using CPU, this will be slow')
+        print('using CPU, this will be slow.')
         use_gpu = False
+        criterion = nn.CrossEntropyLoss()
     else:
         model = model.cuda()
         use_gpu = True
+        criterion = nn.CrossEntropyLoss().cuda()
+        cudnn.benchmark = True
 
-    # define loss function (criterion)
-    criterion = nn.CrossEntropyLoss().cuda()
-
-    if os.path.isfile(args.weights):
-        print("=> loading checkpoint '{}'".format(args.weights))
-        load_checkpoint(model, args.weights)
-    else:
-        print("=> no checkpoint found at '{}'".format(args.weights))
-
-    cudnn.benchmark = True
-
-    # Data loading code
-    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
-    if args.resolution <= 224:
-        trans = transforms.Compose([
-            transforms.Resize((256, 256), interpolation=PIL.Image.BILINEAR),    #   Resize to 256x256 then crop
-            transforms.CenterCrop(args.resolution),
-            transforms.ToTensor(),
-            normalize,
-        ])
-    else:
-        trans = transforms.Compose([
-            transforms.Resize(256 * args.resolution // 224, interpolation=PIL.Image.BILINEAR),  #   Resize to a fixed shorter side length. This usually works better
-            transforms.CenterCrop(args.resolution),
-            transforms.ToTensor(),
-            normalize,
-        ])
-
+    t = []
+    t.append(transforms.Resize(args.resolution))
+    t.append(transforms.CenterCrop(args.resolution))
+    t.append(transforms.ToTensor())
+    t.append(transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD))
+    trans = transforms.Compose(t)
 
     if os.path.exists('/home/dingxiaohan/ndp/imagenet.val.nori.list'):
         #   This is the data source on our machine. For debugging only. You will never need it.
@@ -126,8 +116,8 @@ def validate(val_loader, model, criterion, use_gpu):
             # measure accuracy and record loss
             acc1, acc5 = accuracy(output, target, topk=(1, 5))
             losses.update(loss.item(), images.size(0))
-            top1.update(acc1[0], images.size(0))
-            top5.update(acc5[0], images.size(0))
+            top1.update(acc1.item(), images.size(0))
+            top5.update(acc5.item(), images.size(0))
 
             # measure elapsed time
             batch_time.update(time.time() - end)
@@ -136,12 +126,9 @@ def validate(val_loader, model, criterion, use_gpu):
             if i % 10 == 0:
                 progress.display(i)
 
-        print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
-              .format(top1=top1, top5=top5))
+        print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'.format(top1=top1, top5=top5))
 
     return top1.avg
-
-
 
 
 if __name__ == '__main__':

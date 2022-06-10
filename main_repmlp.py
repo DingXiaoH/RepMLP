@@ -304,7 +304,6 @@ def validate(config, data_loader, model):
         # compute output
         output = model(images)
 
-        #   =============================== deepsup part
         if type(output) is dict:
             output = output['main']
 

@@ -145,18 +145,6 @@ def build_transform(is_train, config):
                 # RandomCrop
                 transform.transforms[0] = transforms.RandomCrop(config.DATA.IMG_SIZE, padding=4)
 
-        elif config.AUG.PRESET.strip() == 'raug10':
-            from randaug import RandAugPolicy
-            transform = transforms.Compose([
-                transforms.RandomResizedCrop(config.DATA.IMG_SIZE),
-                transforms.RandomHorizontalFlip(),
-                RandAugPolicy(magnitude=10),
-                transforms.ToTensor(),
-                transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
-            ])
-            print('---------------------- RAND AUG 10 distortion!')
-            print(transform)
-
         elif config.AUG.PRESET.strip() == 'raug15':
             from randaug import RandAugPolicy
             transform = transforms.Compose([
@@ -167,30 +155,6 @@ def build_transform(is_train, config):
                 transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
             ])
             print('---------------------- RAND AUG 15 distortion!')
-            print(transform)
-
-        elif config.AUG.PRESET.strip() == 'raug20':
-            from randaug import RandAugPolicy
-            transform = transforms.Compose([
-                transforms.RandomResizedCrop(config.DATA.IMG_SIZE),
-                transforms.RandomHorizontalFlip(),
-                RandAugPolicy(magnitude=20),
-                transforms.ToTensor(),
-                transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
-            ])
-            print('---------------------- RAND AUG 20  distortion!')
-            print(transform)
-        elif config.AUG.PRESET.strip() == 'raug25':
-            from randaug import RandAugPolicy
-            transform = transforms.Compose([
-                transforms.RandomResizedCrop(config.DATA.IMG_SIZE),
-                transforms.RandomHorizontalFlip(),
-                RandAugPolicy(magnitude=25),
-                transforms.ToTensor(),
-                transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
-            ])
-            print('---------------------- RAND AUG 25  distortion!')
-            print(transform)
         elif config.AUG.PRESET.strip() == 'weak':
             transform = transforms.Compose([
                 transforms.RandomResizedCrop(config.DATA.IMG_SIZE),
@@ -198,8 +162,6 @@ def build_transform(is_train, config):
                 transforms.ToTensor(),
                 transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
             ])
-            print('---------------------- weak  distortion!')
-            print(transform)
         elif config.AUG.PRESET.strip() == 'none':
             transform = transforms.Compose([
                 transforms.Resize(config.DATA.IMG_SIZE, interpolation=_pil_interp(config.DATA.INTERPOLATION)),
@@ -207,33 +169,23 @@ def build_transform(is_train, config):
                 transforms.ToTensor(),
                 transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
             ])
-            print('---------------------- none  distortion!')
-            print(transform)
         else:
-            print(config.AUG.PRESET)
-            print(type(config.AUG.PRESET))
-            print(config.AUG.PRESET == 'raug20')
             raise ValueError('???' + config.AUG.PRESET)
-
+        print(transform)
         return transform
-
 
     t = []
     if resize_im:
         if config.TEST.CROP:
             size = int((256 / 224) * config.DATA.TEST_SIZE)
-            t.append(
-                transforms.Resize(size, interpolation=_pil_interp(config.DATA.INTERPOLATION)),
+            t.append(transforms.Resize(size, interpolation=_pil_interp(config.DATA.INTERPOLATION)),
                 # to maintain same ratio w.r.t. 224 images
             )
             t.append(transforms.CenterCrop(config.DATA.TEST_SIZE))
         else:
-            t.append(
-                transforms.Resize(config.DATA.TEST_SIZE,
-                                  interpolation=_pil_interp(config.DATA.INTERPOLATION))
-            )
+            #   default for testing
+            t.append(transforms.Resize(config.DATA.TEST_SIZE, interpolation=_pil_interp(config.DATA.INTERPOLATION)))
             t.append(transforms.CenterCrop(config.DATA.TEST_SIZE))
-
     t.append(transforms.ToTensor())
     t.append(transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD))
     trans = transforms.Compose(t)
