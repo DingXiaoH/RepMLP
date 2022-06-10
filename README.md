@@ -52,48 +52,42 @@ If you want to use RepMLP as a building block in your model, just check the defi
 |RepMLPNet-L256|256x256|81.68| 117.7M  | 11.5B |[Google Drive](https://drive.google.com/file/d/1SHhNJ6pZax9qMLm8DJZtQ_XfmcmddPYU/view?usp=sharing), [Baidu](https://pan.baidu.com/s/1qz2JBUyYY6JEpnzFIdm-xQ?pwd=rmlp)|
 
 
-```
-python test.py [imagenet-folder] train RepMLPNet-B256-train-acc8111.pth -a RepMLPNet-B256 -r 256
-```
-Here ```imagenet-folder``` should contain the "train" and "val" folders. The default input resolution is 224x224. Here "train" indicates the training-time architecture.
+# Test our models and verify the equivalency of Locality Injection
 
-You may convert the training-time model into the inference-time structure via Locality Injection and test again to verify the equivalence. For example
-```
-python convert.py RepMLPNet-B256-train-acc8111.pth RepMLPNet-B256-deploy-acc8111.pth -a RepMLPNet-B256
-
-```
-Now "deploy" indicates the inference-time structure (without Local Perceptron).
-
-# Test our models and check the equivalency of Locality Injection
-
-Test with eight GPUs. For example,
+You may test our models with eight GPUs. For example,
 ```
 python -m torch.distributed.launch --nproc_per_node 8 --master_port 12349 main_repmlp.py --data-path [imagenet-folder] --arch RepMLPNet-D256 --batch-size 32 --tag test --eval --resume RepMLPNet-D256-train-acc80.828.pth --opts DATA.IMG_SIZE 256
 ```
 
-If you have only one GPU or you are unfamiliar with PyTorch, you may use a much simpler testing script
+Here ```imagenet-folder``` should contain the "train" and "val" folders, and "train" indicates the training-time architecture.
+
+If you have no more than one GPUs or you are unfamiliar with PyTorch, you may use a much simpler testing script. It runs in CPU and single-GPU mode.
 ```
 python test.py [imagenet-folder] train RepMLPNet-D256-train-acc80.828.pth -a RepMLPNet-D256 -r 256
 ```
 
+You may convert the training-time model into the inference-time structure via Locality Injection and test again to verify the equivalence. We showcase with ```test.py``` since it is short and simple.
 
+Use case A: we may convert the weights of a trained RepMLPNet and save the trained weights; when we use it, we build an inference-time RepMLPNet, load the converted weights and test. For example, we save the converted weights to ```RepMLPNet-D256-deploy.pth```.
+```
+python convert.py RepMLPNet-D256-train-acc80.828.pth RepMLPNet-D256-deploy.pth -a RepMLPNet-D256
+python test.py [imagenet-folder] deploy RepMLPNet-D256-deploy.pth -a RepMLPNet-D256 -r 256
+```
+Here "deploy" indicates building the inference-time architecture.
 
+Use case B: we may build a training-time RepMLPNet, load the weights of the trained model, and convert by calling ```RepMLPNet.locality_injection()``` at any time before testing. You may check the equivalency by
+```
+python test.py [imagenet-folder] check RepMLPNet-D256-train-acc80.828.pth -a RepMLPNet-D256 -r 256
+```
 
 # Train from scratch
 
-Use the training script (based on the script provided by Swin Transformer) to reproduce our results. For examples,
+You may use the training script (based on the script provided by Swin Transformer) to reproduce our results. For examples, you may run
 ```
-python3 -m torch.distributed.launch --nproc_per_node 8 --master_port 12349 main_repmlp.py --arch RepMLPNet-B256 --batch-size 32 --tag my_experiment --opts TRAIN.EPOCHS 100 TRAIN.BASE_LR 0.002 TRAIN.WEIGHT_DECAY 0.1 TRAIN.OPTIMIZER.NAME adamw TRAIN.OPTIMIZER.MOMENTUM 0.9 TRAIN.WARMUP_LR 5e-7 TRAIN.MIN_LR 0.0 TRAIN.WARMUP_EPOCHS 10 AUG.PRESET raug15 AUG.MIXUP 0.4 AUG.CUTMIX 1.0 DATA.IMG_SIZE 256
+python -m torch.distributed.launch --nproc_per_node 8 --master_port 12349 main_repmlp.py --arch RepMLPNet-B256 --batch-size 32 --tag my_experiment --opts TRAIN.EPOCHS 100 TRAIN.BASE_LR 0.002 TRAIN.WEIGHT_DECAY 0.1 TRAIN.OPTIMIZER.NAME adamw TRAIN.OPTIMIZER.MOMENTUM 0.9 TRAIN.WARMUP_LR 5e-7 TRAIN.MIN_LR 0.0 TRAIN.WARMUP_EPOCHS 10 AUG.PRESET raug15 AUG.MIXUP 0.4 AUG.CUTMIX 1.0 DATA.IMG_SIZE 256
 ```
 so that the log and models will be saved to ```output/RepMLPNet-B256/my_experiment```.
 
-# Results
-
-![image](https://user-images.githubusercontent.com/55726946/147339507-71dcdb18-95ea-420f-b80b-310e83d0c301.png)
-
-We have released the weights of RepMLPNet-B224 and B256. The accuracies are slightly higher than those reported in the paper.
-
-Uploading the other weights.
 
 # FAQs
 
