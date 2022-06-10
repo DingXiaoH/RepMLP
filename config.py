@@ -60,10 +60,10 @@ _C.MODEL.LABEL_SMOOTHING = 0.1
 # -----------------------------------------------------------------------------
 _C.TRAIN = CN()
 _C.TRAIN.START_EPOCH = 0
-_C.TRAIN.EPOCHS = 300
-_C.TRAIN.WARMUP_EPOCHS = 20
-_C.TRAIN.WEIGHT_DECAY = 0.05
-_C.TRAIN.BASE_LR = 5e-4
+_C.TRAIN.EPOCHS = 100
+_C.TRAIN.WARMUP_EPOCHS = 10
+_C.TRAIN.WEIGHT_DECAY = 0.1
+_C.TRAIN.BASE_LR = 0.002
 _C.TRAIN.WARMUP_LR = 0.0
 _C.TRAIN.MIN_LR = 0.0
 # Clip gradient norm
@@ -87,7 +87,7 @@ _C.TRAIN.LR_SCHEDULER.DECAY_RATE = 0.1
 
 # Optimizer
 _C.TRAIN.OPTIMIZER = CN()
-_C.TRAIN.OPTIMIZER.NAME = 'sgd'
+_C.TRAIN.OPTIMIZER.NAME = 'adamw'
 # Optimizer Epsilon
 _C.TRAIN.OPTIMIZER.EPS = 1e-8
 # Optimizer Betas

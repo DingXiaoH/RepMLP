@@ -5,7 +5,6 @@
 # Licensed under The MIT License [see LICENSE for details]
 # The training script is based on the code of Swin Transformer (https://github.com/microsoft/Swin-Transformer)
 # --------------------------------------------------------
-
 import os
 import torch
 import numpy as np
@@ -18,8 +17,6 @@ try:
     from timm.data.transforms import str_to_pil_interp as _pil_interp
 except:
     from timm.data.transforms import _pil_interp
-
-
 from .cached_image_folder import CachedImageFolder
 from .samplers import SubsetRandomSampler
 
@@ -68,7 +65,6 @@ def build_loader(config):
             drop_last=False
         )
 
-
     # setup mixup / cutmix
     mixup_fn = None
     mixup_active = config.AUG.MIXUP > 0 or config.AUG.CUTMIX > 0. or config.AUG.CUTMIX_MINMAX is not None
@@ -91,10 +87,18 @@ def build_dataset(is_train, config):
             dataset = CachedImageFolder(config.DATA.DATA_PATH, ann_file, prefix, transform,
                                         cache_mode=config.DATA.CACHE_MODE if is_train else 'part')
         else:
-            import torchvision
-            print('use raw ImageNet data')
-            dataset = torchvision.datasets.ImageNet(root=config.DATA.DATA_PATH, split='train' if is_train else 'val', transform=transform)
+            # Data source on our machines. You will never need it.
+            nori_root = os.path.join('/home/dingxiaohan/ndp/', 'imagenet.train.nori.list' if is_train else 'imagenet.val.nori.list')
+            if os.path.exists(nori_root):
+                # Data source on our machines. You will never need it.
+                from nori_dataset import ImageNetNoriDataset
+                dataset = ImageNetNoriDataset(nori_root, transform=transform)
+            else:
+                import torchvision
+                print('use raw ImageNet data')
+                dataset = torchvision.datasets.ImageNet(root=config.DATA.DATA_PATH, split='train' if is_train else 'val', transform=transform)
         nb_classes = 1000
+        
     elif config.DATA.DATASET == 'cf100':
         mean = [0.5070751592371323, 0.48654887331495095, 0.4409178433670343]
         std = [0.2673342858792401, 0.2564384629170883, 0.27615047132568404]
