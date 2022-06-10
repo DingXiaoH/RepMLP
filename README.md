@@ -42,7 +42,15 @@ If you want to use RepMLP as a building block in your model, just check the defi
 
 # Pre-trained models
 
-You may download our pre-trained models from [Google Drive](https://drive.google.com/drive/folders/1eDFunxOQ67MvBBmJ4Bw01TFh2YVNRrg2?usp=sharing) or [Baidu Cloud](https://pan.baidu.com/s/14tGRpKT_WohX7UBcnWH6Zg) (the access key of Baidu is "rmlp").
+| name | resolution |ImageNet-1K acc | #params | FLOPs | ImageNet-1K pretrained model |
+|:---:|:---:|:---:|:---:| :---:|:---:|
+|RepMLPNet-D256|256x256|80.83| 86.9M   | 8.6B  |[Google Drive](https://x), [Baidu](https://pan.baidu.com/s/12PvSLGepMCCImr--D-RQvw?pwd=rmlp)|
+|RepMLPNet-L256|256x256|81.68| 117.7M  | 11.5B |[Google Drive](https://x), [Baidu](https://pan.baidu.com/s/1qz2JBUyYY6JEpnzFIdm-xQ?pwd=rmlp)|
+
+
+```
+
+
 ```
 python test.py [imagenet-folder] train RepMLPNet-B256-train-acc8111.pth -a RepMLPNet-B256 -r 256
 ```
@@ -51,13 +59,24 @@ Here ```imagenet-folder``` should contain the "train" and "val" folders. The def
 You may convert the training-time model into the inference-time structure via Locality Injection and test again to verify the equivalence. For example
 ```
 python convert.py RepMLPNet-B256-train-acc8111.pth RepMLPNet-B256-deploy-acc8111.pth -a RepMLPNet-B256
-python test.py [imagenet-folder] deploy RepMLPNet-B256-deploy-acc8111.pth -a RepMLPNet-B256 -r 256
+
 ```
 Now "deploy" indicates the inference-time structure (without Local Perceptron).
 
 # Test our models and check the equivalency of Locality Injection
 
-todo
+Test with eight GPUs. For example,
+```
+python -m torch.distributed.launch --nproc_per_node 8 --master_port 12349 main_repmlp.py --data-path [imagenet-folder] --arch RepMLPNet-D256 --batch-size 32 --tag test --eval --resume RepMLPNet-D256-train-acc80.828.pth --opts DATA.IMG_SIZE 256
+```
+
+If you have only one GPU or you are unfamiliar with PyTorch, you may use a much simpler testing script
+```
+python test.py [imagenet-folder] train RepMLPNet-D256-train-acc80.828.pth -a RepMLPNet-D256 -r 256
+```
+
+
+
 
 # Train from scratch
 
