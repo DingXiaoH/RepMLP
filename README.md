@@ -21,7 +21,7 @@ Citation:
 
 Old version: https://arxiv.org/abs/2105.01883
 
-# How to use the code
+# Code of RepMLP and Locality Injection
 
 Please check ```repmlpnet.py``` for the definition of our models.
 
@@ -40,46 +40,54 @@ If you want to use RepMLP as a building block in your model, just check the defi
 ```
 
 
-# Use our pre-trained models
+# Pre-trained models
 
-You may download our pre-trained models from [Google Drive](https://drive.google.com/drive/folders/1eDFunxOQ67MvBBmJ4Bw01TFh2YVNRrg2?usp=sharing) or [Baidu Cloud](https://pan.baidu.com/s/14tGRpKT_WohX7UBcnWH6Zg) (the access key of Baidu is "rmlp").
-```
-python test.py [imagenet-folder] train RepMLPNet-B256-train-acc8111.pth -a RepMLPNet-B256 -r 256
-```
-Here ```imagenet-folder``` should contain the "train" and "val" folders. The default input resolution is 224x224. Here "train" indicates the training-time architecture.
+| name | resolution |ImageNet-1K acc | #params | FLOPs | ImageNet-1K pretrained model |
+|:---:|:---:|:---:|:---:| :---:|:---:|
+|RepMLPNet-T224|224x224| | | | uploading|
+|RepMLPNet-B224|224x224| | | | uploading|
+|RepMLPNet-T256|256x256| | | | uploading|
+|RepMLPNet-B256|256x256| | | | uploading|
+|RepMLPNet-D256|256x256|80.83| 86.9M   | 8.6B  |[Google Drive](https://drive.google.com/file/d/1e5IYac0UHnJq2_lzbuE7J4rahMENX2ha/view?usp=sharing), [Baidu](https://pan.baidu.com/s/12PvSLGepMCCImr--D-RQvw?pwd=rmlp)|
+|RepMLPNet-L256|256x256|81.68| 117.7M  | 11.5B |[Google Drive](https://drive.google.com/file/d/1SHhNJ6pZax9qMLm8DJZtQ_XfmcmddPYU/view?usp=sharing), [Baidu](https://pan.baidu.com/s/1qz2JBUyYY6JEpnzFIdm-xQ?pwd=rmlp)|
 
-You may convert the training-time model into the inference-time structure via Locality Injection and test again to verify the equivalence. For example
+
+# Test our models and verify the equivalency of Locality Injection
+
+You may test our models with eight GPUs. For example,
 ```
-python convert.py RepMLPNet-B256-train-acc8111.pth RepMLPNet-B256-deploy-acc8111.pth -a RepMLPNet-B256
-python test.py [imagenet-folder] deploy RepMLPNet-B256-deploy-acc8111.pth -a RepMLPNet-B256 -r 256
+python -m torch.distributed.launch --nproc_per_node 8 --master_port 12349 main_repmlp.py --data-path [imagenet-folder] --arch RepMLPNet-D256 --batch-size 32 --tag test --eval --resume RepMLPNet-D256-train-acc80.828.pth --opts DATA.IMG_SIZE 256
 ```
-Now "deploy" indicates the inference-time structure (without Local Perceptron).
+
+Here ```imagenet-folder``` should contain the "train" and "val" folders, and "train" indicates the training-time architecture.
+
+If you have no more than one GPUs or you are unfamiliar with PyTorch, you may use a much simpler testing script. It runs in CPU and single-GPU mode.
+```
+python test.py [imagenet-folder] train RepMLPNet-D256-train-acc80.828.pth -a RepMLPNet-D256 -r 256
+```
+
+We showcase the transformation from the training-time model into the inference-time structure with ```test.py``` since this script is short and simple.
+
+**Use case A**: we may convert the weights of a trained RepMLPNet and save the trained weights; when we use it, we build an inference-time RepMLPNet, load the converted weights and test. For example, we save the converted weights to ```RepMLPNet-D256-deploy.pth```.
+```
+python convert.py RepMLPNet-D256-train-acc80.828.pth RepMLPNet-D256-deploy.pth -a RepMLPNet-D256
+python test.py [imagenet-folder] deploy RepMLPNet-D256-deploy.pth -a RepMLPNet-D256 -r 256
+```
+Here "deploy" indicates building the inference-time architecture.
+
+**Use case B**: we may build a training-time RepMLPNet, load the weights of the trained model, and convert by calling ```RepMLPNet.locality_injection()``` at any time before testing. You may check the equivalency by
+```
+python test.py [imagenet-folder] check RepMLPNet-D256-train-acc80.828.pth -a RepMLPNet-D256 -r 256
+```
 
 # Train from scratch
 
-Use the training script (based on the script provided by Swin Transformer) to reproduce our results. For examples,
+You may use the training script (based on the script provided by [Swin Transformer](https://github.com/microsoft/Swin-Transformer)) to reproduce our results. For example, you may run
 ```
-python3 -m torch.distributed.launch --nproc_per_node 8 --master_port 12349 main_repmlp.py --arch RepMLPNet-B256 --batch-size 32 --tag my_experiment --opts TRAIN.EPOCHS 100 TRAIN.BASE_LR 0.002 TRAIN.WEIGHT_DECAY 0.1 TRAIN.OPTIMIZER.NAME adamw TRAIN.OPTIMIZER.MOMENTUM 0.9 TRAIN.WARMUP_LR 5e-7 TRAIN.MIN_LR 0.0 TRAIN.WARMUP_EPOCHS 10 AUG.PRESET raug15 AUG.MIXUP 0.4 AUG.CUTMIX 1.0 TRAIN.EMA_ALPHA 1e-5 DATA.IMG_SIZE 256
+python -m torch.distributed.launch --nproc_per_node 8 --master_port 12349 main_repmlp.py --arch RepMLPNet-B256 --batch-size 32 --tag my_experiment --opts TRAIN.EPOCHS 100 TRAIN.BASE_LR 0.002 TRAIN.WEIGHT_DECAY 0.1 TRAIN.OPTIMIZER.NAME adamw TRAIN.OPTIMIZER.MOMENTUM 0.9 TRAIN.WARMUP_LR 5e-7 TRAIN.MIN_LR 0.0 TRAIN.WARMUP_EPOCHS 10 AUG.PRESET raug15 AUG.MIXUP 0.4 AUG.CUTMIX 1.0 DATA.IMG_SIZE 256
 ```
 so that the log and models will be saved to ```output/RepMLPNet-B256/my_experiment```.
 
-# Abstract
-
-Compared to convolutional layers, fully-connected (FC) layers are better at modeling the long-range dependencies but worse at capturing the local patterns, hence usually less favored for image recognition. In this paper, we propose a methodology, Locality Injection, to incorporate local priors into an FC layer via merging the trained parameters of a parallel conv kernel into the FC kernel. Locality Injection can be viewed as a novel Structural Re-parameterization method since it equivalently converts the structures via transforming the parameters. Based on that, we propose a multi-layer-perceptron (MLP) block named RepMLP Block, which uses three FC layers to extract features, and a novel architecture named RepMLPNet. The hierarchical design distinguishes RepMLPNet from the other concurrently proposed vision MLPs. As it produces feature maps of different levels, it qualifies as a backbone model for downstream tasks like semantic segmentation. Our results reveal that 1) Locality Injection is a general methodology for MLP models; 2) RepMLPNet has favorable accuracy-efficiency trade-off compared to the other MLPs; 3) RepMLPNet is the first MLP that seamlessly transfer to Cityscapes semantic segmentation.
-
-# Results
-
-![image](https://user-images.githubusercontent.com/55726946/147339507-71dcdb18-95ea-420f-b80b-310e83d0c301.png)
-
-We have released the weights of RepMLPNet-B224 and B256. The accuracies are slightly higher than those reported in the paper.
-
-Uploading the other weights.
-
-# TODO
-
-Release more model weights (in several days, I think)
-
-Training code (based on the code of Swin and DeiT)
 
 # FAQs
 
