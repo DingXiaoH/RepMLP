@@ -1,3 +1,10 @@
+# --------------------------------------------------------
+# RepMLPNet: Hierarchical Vision MLP with Re-parameterized Locality (https://arxiv.org/abs/2112.11081)
+# CVPR 2022
+# Github source: https://github.com/DingXiaoH/RepMLP
+# Licensed under The MIT License [see LICENSE for details]
+# The training script is based on the code of Swin Transformer (https://github.com/microsoft/Swin-Transformer)
+# --------------------------------------------------------
 import argparse
 import os
 import time
@@ -12,7 +19,7 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 from utils import accuracy, ProgressMeter, AverageMeter, load_checkpoint
 import PIL
-from repmlpnet import *
+from repmlpnet import get_RepMLPNet_model
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Test')
 parser.add_argument('data', metavar='DATA', help='path to dataset')
@@ -30,12 +37,7 @@ parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
 
 def test():
     args = parser.parse_args()
-    if args.arch == 'RepMLPNet-B224':
-        model = create_RepMLPNet_B224(deploy=args.mode == 'deploy')
-    elif args.arch == 'RepMLPNet-B256':
-        model = create_RepMLPNet_B256(deploy=args.mode == 'deploy')
-    else:
-        raise ValueError('TODO')
+    model = get_RepMLPNet_model(name=args.arch, deploy=args.mode == 'deploy')
 
     num_params = 0
     for k, v in model.state_dict().items():
@@ -81,7 +83,7 @@ def test():
 
 
     if os.path.exists('/home/dingxiaohan/ndp/imagenet.val.nori.list'):
-        #   This is the data source on our machine. For debugging only. You won't need it.
+        #   This is the data source on our machine. For debugging only. You will never need it.
         from noris_dataset import ImageNetNoriDataset
         val_dataset = ImageNetNoriDataset('/home/dingxiaohan/ndp/imagenet.val.nori.list', trans)
     else:

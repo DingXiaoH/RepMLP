@@ -1,9 +1,8 @@
 # --------------------------------------------------------
-# RepMLPNet
+# RepMLPNet: Hierarchical Vision MLP with Re-parameterized Locality (https://arxiv.org/abs/2112.11081)
+# CVPR 2022
+# Github source: https://github.com/DingXiaoH/RepMLP
 # Licensed under The MIT License [see LICENSE for details]
-# Written by Xiaohan Ding
-#   https://arxiv.org/abs/2112.11081
-#   https://github.com/DingXiaoH/RepMLP
 # --------------------------------------------------------
 
 import torch.nn.functional as F
@@ -270,7 +269,14 @@ class RepMLPNet(nn.Module):
             if hasattr(m, 'local_inject'):
                 m.local_inject()
 
-
+def create_RepMLPNet_T224(deploy=False):
+    return RepMLPNet(channels=(64, 128, 256, 512), hs=(56,28,14,7), ws=(56,28,14,7),
+                      num_blocks=(2,2,6,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,16,128),
+                     deploy=deploy)
+def create_RepMLPNet_T256(deploy=False):
+    return RepMLPNet(channels=(64, 128, 256, 512), hs=(64,32,16,8), ws=(64,32,16,8),
+                      num_blocks=(2,2,6,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,16,128),
+                     deploy=deploy)
 def create_RepMLPNet_B224(deploy=False):
     return RepMLPNet(channels=(96, 192, 384, 768), hs=(56,28,14,7), ws=(56,28,14,7),
                       num_blocks=(2,2,12,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,32,128),
@@ -279,7 +285,29 @@ def create_RepMLPNet_B256(deploy=False):
     return RepMLPNet(channels=(96, 192, 384, 768), hs=(64,32,16,8), ws=(64,32,16,8),
                       num_blocks=(2,2,12,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,32,128),
                      deploy=deploy)
+def create_RepMLPNet_D256(deploy=False):
+    return RepMLPNet(channels=(80, 160, 320, 640), hs=(64,32,16,8), ws=(64,32,16,8),
+                      num_blocks=(2,2,18,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,16,128),
+                     deploy=deploy)
+def create_RepMLPNet_L256(deploy=False):
+    return RepMLPNet(channels=(96, 192, 384, 768), hs=(64,32,16,8), ws=(64,32,16,8),
+                      num_blocks=(2,2,18,2), reparam_conv_k=(1, 3), sharesets_nums=(1,4,32,256),
+                     deploy=deploy)
 
+model_map = {
+    'RepMLPNet-T256': create_RepMLPNet_T256,
+    'RepMLPNet-T224': create_RepMLPNet_T224,
+    'RepMLPNet-B224': create_RepMLPNet_B224,
+    'RepMLPNet-B256': create_RepMLPNet_B256,
+    'RepMLPNet-D256': create_RepMLPNet_D256,
+    'RepMLPNet-L256': create_RepMLPNet_L256,
+}
+
+def get_RepMLPNet_model(name, deploy=False):
+    if name not in model_map:
+        raise ValueError('Not yet supported. You may add some code to create the model here.')
+    model = model_map[name](deploy=deploy)
+    return model
 
 
 #   Verify the equivalency
