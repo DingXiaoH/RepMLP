@@ -21,7 +21,7 @@ Citation:
 
 Old version: https://arxiv.org/abs/2105.01883
 
-# How to use the code
+# Code of RepMLP and Locality Injection
 
 Please check ```repmlpnet.py``` for the definition of our models.
 
@@ -40,7 +40,7 @@ If you want to use RepMLP as a building block in your model, just check the defi
 ```
 
 
-# Use our pre-trained models
+# Pre-trained models
 
 You may download our pre-trained models from [Google Drive](https://drive.google.com/drive/folders/1eDFunxOQ67MvBBmJ4Bw01TFh2YVNRrg2?usp=sharing) or [Baidu Cloud](https://pan.baidu.com/s/14tGRpKT_WohX7UBcnWH6Zg) (the access key of Baidu is "rmlp").
 ```
@@ -55,6 +55,10 @@ python test.py [imagenet-folder] deploy RepMLPNet-B256-deploy-acc8111.pth -a Rep
 ```
 Now "deploy" indicates the inference-time structure (without Local Perceptron).
 
+# Test our models and check the equivalency of Locality Injection
+
+todo
+
 # Train from scratch
 
 Use the training script (based on the script provided by Swin Transformer) to reproduce our results. For examples,
@@ -63,10 +67,6 @@ python3 -m torch.distributed.launch --nproc_per_node 8 --master_port 12349 main_
 ```
 so that the log and models will be saved to ```output/RepMLPNet-B256/my_experiment```.
 
-# Abstract
-
-Compared to convolutional layers, fully-connected (FC) layers are better at modeling the long-range dependencies but worse at capturing the local patterns, hence usually less favored for image recognition. In this paper, we propose a methodology, Locality Injection, to incorporate local priors into an FC layer via merging the trained parameters of a parallel conv kernel into the FC kernel. Locality Injection can be viewed as a novel Structural Re-parameterization method since it equivalently converts the structures via transforming the parameters. Based on that, we propose a multi-layer-perceptron (MLP) block named RepMLP Block, which uses three FC layers to extract features, and a novel architecture named RepMLPNet. The hierarchical design distinguishes RepMLPNet from the other concurrently proposed vision MLPs. As it produces feature maps of different levels, it qualifies as a backbone model for downstream tasks like semantic segmentation. Our results reveal that 1) Locality Injection is a general methodology for MLP models; 2) RepMLPNet has favorable accuracy-efficiency trade-off compared to the other MLPs; 3) RepMLPNet is the first MLP that seamlessly transfer to Cityscapes semantic segmentation.
-
 # Results
 
 ![image](https://user-images.githubusercontent.com/55726946/147339507-71dcdb18-95ea-420f-b80b-310e83d0c301.png)
@@ -74,12 +74,6 @@ Compared to convolutional layers, fully-connected (FC) layers are better at mode
 We have released the weights of RepMLPNet-B224 and B256. The accuracies are slightly higher than those reported in the paper.
 
 Uploading the other weights.
-
-# TODO
-
-Release more model weights (in several days, I think)
-
-Training code (based on the code of Swin and DeiT)
 
 # FAQs
 
