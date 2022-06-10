@@ -48,8 +48,8 @@ If you want to use RepMLP as a building block in your model, just check the defi
 |RepMLPNet-B224|224x224| | | | uploading|
 |RepMLPNet-T256|256x256| | | | uploading|
 |RepMLPNet-B256|256x256| | | | uploading|
-|RepMLPNet-D256|256x256|80.83| 86.9M   | 8.6B  |[Google Drive](https://x), [Baidu](https://pan.baidu.com/s/12PvSLGepMCCImr--D-RQvw?pwd=rmlp)|
-|RepMLPNet-L256|256x256|81.68| 117.7M  | 11.5B |[Google Drive](https://x), [Baidu](https://pan.baidu.com/s/1qz2JBUyYY6JEpnzFIdm-xQ?pwd=rmlp)|
+|RepMLPNet-D256|256x256|80.83| 86.9M   | 8.6B  |[Google Drive](https://drive.google.com/file/d/1e5IYac0UHnJq2_lzbuE7J4rahMENX2ha/view?usp=sharing), [Baidu](https://pan.baidu.com/s/12PvSLGepMCCImr--D-RQvw?pwd=rmlp)|
+|RepMLPNet-L256|256x256|81.68| 117.7M  | 11.5B |[Google Drive](https://drive.google.com/file/d/1SHhNJ6pZax9qMLm8DJZtQ_XfmcmddPYU/view?usp=sharing), [Baidu](https://pan.baidu.com/s/1qz2JBUyYY6JEpnzFIdm-xQ?pwd=rmlp)|
 
 
 ```
