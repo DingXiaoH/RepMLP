@@ -98,7 +98,7 @@ def build_dataset(is_train, config):
                 print('use raw ImageNet data')
                 dataset = torchvision.datasets.ImageNet(root=config.DATA.DATA_PATH, split='train' if is_train else 'val', transform=transform)
         nb_classes = 1000
-        
+
     elif config.DATA.DATASET == 'cf100':
         mean = [0.5070751592371323, 0.48654887331495095, 0.4409178433670343]
         std = [0.2673342858792401, 0.2564384629170883, 0.27615047132568404]

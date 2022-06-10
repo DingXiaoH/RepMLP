@@ -18,7 +18,7 @@ from config import get_config
 from data import build_loader
 from lr_scheduler import build_scheduler
 from logger import create_logger
-from utils import load_checkpoint, save_checkpoint, get_grad_norm, auto_resume_helper, reduce_tensor, save_latest, update_model_ema, unwrap_model
+from utils import load_checkpoint, save_checkpoint, get_grad_norm, auto_resume_helper, reduce_tensor, save_latest, update_model_ema, unwrap_model, load_weights
 import copy
 from optimizer import build_optimizer
 from repmlpnet import get_RepMLPNet_model
@@ -43,7 +43,6 @@ def parse_option():
     parser.add_argument('--arch', default=None, type=str, help='arch name')
     parser.add_argument('--batch-size', default=128, type=int, help="batch size for single GPU")
     parser.add_argument('--data-path', default='/path/to/imgnet/', type=str, help='path to dataset')
-    parser.add_argument('--scales-path', default=None, type=str, help='path to the trained Hyper-Search model')
     parser.add_argument('--zip', action='store_true', help='use zipped dataset instead of folder dataset')
     parser.add_argument('--cache-mode', type=str, default='part', choices=['no', 'full', 'part'],
                         help='no: no cache, '
@@ -101,6 +100,17 @@ def main(config):
         flops = model_without_ddp.flops()
         logger.info(f"number of GFLOPs: {flops / 1e9}")
 
+    if config.THROUGHPUT_MODE:
+        throughput(data_loader_val, model, logger)
+        return
+
+    if config.EVAL_MODE:
+        load_weights(model, config.MODEL.RESUME)
+        acc1, acc5, loss = validate(config, data_loader_val, model)
+        logger.info(f"Only eval. top-1 acc, top-5 acc, loss: {acc1:.3f}, {acc5:.3f}, {loss:.5f}")
+        return
+
+
     lr_scheduler = build_scheduler(config, optimizer, len(data_loader_train))
 
     if config.AUG.MIXUP > 0.:
@@ -110,6 +120,8 @@ def main(config):
         criterion = LabelSmoothingCrossEntropy(smoothing=config.MODEL.LABEL_SMOOTHING)
     else:
         criterion = torch.nn.CrossEntropyLoss()
+
+
 
     max_accuracy = 0.0
     max_ema_accuracy = 0.0
@@ -134,13 +146,7 @@ def main(config):
     if (not config.THROUGHPUT_MODE) and config.MODEL.RESUME:
         max_accuracy = load_checkpoint(config, model_without_ddp, optimizer, lr_scheduler, logger, model_ema=model_ema)
 
-    if config.THROUGHPUT_MODE:
-        throughput(data_loader_val, model, logger)
-        return
 
-    if config.EVAL_MODE:
-        acc1, acc5, loss = validate(config, data_loader_val, model)
-        logger.info(f"Only eval. top-1 acc, top-5 acc, loss: {acc1:.3f}, {acc5:.3f}, {loss:.5f}")
 
     logger.info("Start training")
     start_time = time.time()

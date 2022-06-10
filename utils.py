@@ -53,6 +53,13 @@ def load_checkpoint(config, model, optimizer, lr_scheduler, logger, model_ema=No
     torch.cuda.empty_cache()
     return max_accuracy
 
+def load_weights(model, path):
+    checkpoint = torch.load(path, map_location='cpu')
+    if 'model' in checkpoint:
+        checkpoint = checkpoint['model']
+    unwrap_model(model).load_state_dict(checkpoint, strict=False)
+    print('=================== loaded from', path)
+
 
 def save_latest(config, epoch, model, max_accuracy, optimizer, lr_scheduler, logger, model_ema=None):
     save_state = {'model': model.state_dict(),

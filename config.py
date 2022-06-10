@@ -99,9 +99,6 @@ _C.TRAIN.OPTIMIZER.MOMENTUM = 0.9
 _C.TRAIN.EMA_ALPHA = 0.0
 _C.TRAIN.EMA_UPDATE_PERIOD = 8
 
-#   For RepOptimizer only
-_C.TRAIN.SCALES_PATH = None
-
 # -----------------------------------------------------------------------------
 # Augmentation settings
 # -----------------------------------------------------------------------------
@@ -168,8 +165,6 @@ def update_config(config, args):
     if args.opts:
         config.merge_from_list(args.opts)
     # merge from specific arguments
-    if args.scales_path:
-        config.TRAIN.SCALES_PATH = args.scales_path
     if args.arch:
         config.MODEL.ARCH = args.arch
     if args.batch_size:
@@ -200,7 +195,7 @@ def update_config(config, args):
     if config.DATA.TEST_SIZE is None:
         config.DATA.TEST_SIZE = config.DATA.IMG_SIZE
     if config.DATA.TEST_BATCH_SIZE is None:
-        config.DATA.TEST_BATCH_SIZE = config.DATA.BATCH_SIZE // 4
+        config.DATA.TEST_BATCH_SIZE = config.DATA.BATCH_SIZE
     # set local rank for distributed training
     config.LOCAL_RANK = args.local_rank
     # output folder
