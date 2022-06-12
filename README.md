@@ -58,13 +58,11 @@ You may test our models with eight GPUs. For example,
 ```
 python -m torch.distributed.launch --nproc_per_node 8 --master_port 12349 main_repmlp.py --data-path [imagenet-folder] --arch RepMLPNet-D256 --batch-size 32 --tag test --eval --resume RepMLPNet-D256-train-acc80.828.pth --opts DATA.IMG_SIZE 256
 ```
-
-Here ```imagenet-folder``` should contain the "train" and "val" folders, and "train" indicates the training-time architecture.
-
-If you have no more than one GPUs or you are unfamiliar with PyTorch, you may use a much simpler testing script. It runs in CPU and single-GPU mode.
+If you have no more than one GPUs or you are unfamiliar with PyTorch, you may use a much simpler testing script. It runs in CPU and single-GPU mode. 
 ```
 python test.py [imagenet-folder] train RepMLPNet-D256-train-acc80.828.pth -a RepMLPNet-D256 -r 256
 ```
+Here "train" indicates the training-time architecture.
 
 We showcase the transformation from the training-time model into the inference-time structure with ```test.py``` since this script is short and simple.
 
@@ -86,7 +84,7 @@ You may use the training script (based on the script provided by [Swin Transform
 ```
 python -m torch.distributed.launch --nproc_per_node 8 --master_port 12349 main_repmlp.py --arch RepMLPNet-B256 --batch-size 32 --tag my_experiment --opts TRAIN.EPOCHS 100 TRAIN.BASE_LR 0.002 TRAIN.WEIGHT_DECAY 0.1 TRAIN.OPTIMIZER.NAME adamw TRAIN.OPTIMIZER.MOMENTUM 0.9 TRAIN.WARMUP_LR 5e-7 TRAIN.MIN_LR 0.0 TRAIN.WARMUP_EPOCHS 10 AUG.PRESET raug15 AUG.MIXUP 0.4 AUG.CUTMIX 1.0 DATA.IMG_SIZE 256
 ```
-so that the log and models will be saved to ```output/RepMLPNet-B256/my_experiment```.
+so that the log and models will be saved to ```output/RepMLPNet-B256/my_experiment/```.
 
 
 # FAQs
