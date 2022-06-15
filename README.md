@@ -21,7 +21,7 @@ Citation:
 
 Old version: https://arxiv.org/abs/2105.01883
 
-# Code of RepMLP and Locality Injection
+## Code of RepMLP and Locality Injection
 
 Please check ```repmlpnet.py``` for the definition of our models.
 
@@ -40,7 +40,7 @@ If you want to use RepMLP as a building block in your model, just check the defi
 ```
 
 
-# Pre-trained models
+## Pre-trained models
 
 | name | resolution |ImageNet-1K acc | #params | FLOPs | ImageNet-1K pretrained model |
 |:---:|:---:|:---:|:---:| :---:|:---:|
@@ -52,7 +52,7 @@ If you want to use RepMLP as a building block in your model, just check the defi
 |RepMLPNet-L256|256x256|81.68| 117.7M  | 11.5B |[Google Drive](https://drive.google.com/file/d/1SHhNJ6pZax9qMLm8DJZtQ_XfmcmddPYU/view?usp=sharing), [Baidu](https://pan.baidu.com/s/1qz2JBUyYY6JEpnzFIdm-xQ?pwd=rmlp)|
 
 
-# Test our models and verify the equivalency of Locality Injection
+## Test our models and verify the equivalency of Locality Injection
 
 You may test our models with eight GPUs. For example,
 ```
@@ -78,16 +78,16 @@ Here "deploy" indicates building the inference-time architecture.
 python test.py [imagenet-folder] check RepMLPNet-D256-train-acc80.828.pth -a RepMLPNet-D256 -r 256
 ```
 
-# Train from scratch
+## Train from scratch
 
 You may use the training script (based on the script provided by [Swin Transformer](https://github.com/microsoft/Swin-Transformer)) to reproduce our results. For example, you may run
 ```
-python -m torch.distributed.launch --nproc_per_node 8 --master_port 12349 main_repmlp.py --arch RepMLPNet-B256 --batch-size 32 --tag my_experiment --opts TRAIN.EPOCHS 100 TRAIN.BASE_LR 0.002 TRAIN.WEIGHT_DECAY 0.1 TRAIN.OPTIMIZER.NAME adamw TRAIN.OPTIMIZER.MOMENTUM 0.9 TRAIN.WARMUP_LR 5e-7 TRAIN.MIN_LR 0.0 TRAIN.WARMUP_EPOCHS 10 AUG.PRESET raug15 AUG.MIXUP 0.4 AUG.CUTMIX 1.0 DATA.IMG_SIZE 256
+python -m torch.distributed.launch --nproc_per_node 8 --master_port 12349 main_repmlp.py --arch RepMLPNet-B256 --batch-size 32 --tag my_experiment --opts TRAIN.EPOCHS 100 TRAIN.BASE_LR 0.001 TRAIN.WEIGHT_DECAY 0.1 TRAIN.OPTIMIZER.NAME adamw TRAIN.OPTIMIZER.MOMENTUM 0.9 TRAIN.WARMUP_LR 5e-7 TRAIN.MIN_LR 0.0 TRAIN.WARMUP_EPOCHS 10 AUG.PRESET raug15 AUG.MIXUP 0.4 AUG.CUTMIX 1.0 DATA.IMG_SIZE 256
 ```
 so that the log and models will be saved to ```output/RepMLPNet-B256/my_experiment/```.
 
 
-# FAQs
+## FAQs
 
 **Q**: Is the inference-time model's output the _same_ as the training-time model?
 
