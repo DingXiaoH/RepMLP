@@ -42,6 +42,8 @@ If you want to use RepMLP as a building block in your model, just check the defi
 
 ## Pre-trained models
 
+We have released the models **reproduced with the training script in this repository**.
+
 | name | resolution |ImageNet-1K acc | #params | FLOPs | ImageNet-1K pretrained model |
 |:---:|:---:|:---:|:---:| :---:|:---:|
 |RepMLPNet-T224|224x224| 76.62 | 38.3M| 2.8B | uploading|
