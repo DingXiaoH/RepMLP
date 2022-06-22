@@ -46,10 +46,10 @@ We have released the models **reproduced with the training script in this reposi
 
 | name | resolution |ImageNet-1K acc | #params | FLOPs | ImageNet-1K pretrained model |
 |:---:|:---:|:---:|:---:| :---:|:---:|
-|RepMLPNet-T224|224x224| 76.62 | 38.3M| 2.8B | uploading|
-|RepMLPNet-B224|224x224| 80.32 | 68.2M| 6.7B | uploading|
-|RepMLPNet-T256|256x256| 77.44 | 58.7M| 4.2B | uploading|
-|RepMLPNet-B256|256x256| 81.03 | 96.5M| 9.6B | uploading|
+|RepMLPNet-T224|224x224| 76.62 | 38.3M| 2.8B | [Google Drive](https://drive.google.com/file/d/1TgPDD78G-d3h_Y_vNTuqYdSJZHmnju7b/view?usp=sharing), [Baidu](https://pan.baidu.com/s/1vDMl06wVUvkJgC7DOeleNA?pwd=rmlp)|
+|RepMLPNet-B224|224x224| 80.32 | 68.2M| 6.7B | [Google Drive](https://drive.google.com/file/d/1GwoUvxGXgzKArlCf0V9kvc9_3GtkGltp/view?usp=sharing), [Baidu](https://pan.baidu.com/s/1MzkKTTzmOdOvtUCuRqwswA?pwd=rmlp)|
+|RepMLPNet-T256|256x256| 77.44 | 58.7M| 4.2B | [Google Drive](https://drive.google.com/file/d/1mU0L76x20eAKzkHxEM7J2BvEOLWx_mux/view?usp=sharing), [Baidu](https://pan.baidu.com/s/1pALVZES9lVnjpXf20NxW3Q?pwd=rmlp)|
+|RepMLPNet-B256|256x256| 81.03 | 96.5M| 9.6B | [Google Drive](https://drive.google.com/file/d/1W-__gXE7903cX-gOSXEGxNBCJjvqFCiJ/view?usp=sharing), [Baidu](https://pan.baidu.com/s/1GGqIOoVBAd3thaU5LoUtqQ?pwd=rmlp)|
 |RepMLPNet-D256|256x256| 80.83 | 86.9M| 8.6B |[Google Drive](https://drive.google.com/file/d/1e5IYac0UHnJq2_lzbuE7J4rahMENX2ha/view?usp=sharing), [Baidu](https://pan.baidu.com/s/12PvSLGepMCCImr--D-RQvw?pwd=rmlp)|
 |RepMLPNet-L256|256x256| 81.68 | 117.7M  | 11.5B |[Google Drive](https://drive.google.com/file/d/1SHhNJ6pZax9qMLm8DJZtQ_XfmcmddPYU/view?usp=sharing), [Baidu](https://pan.baidu.com/s/1qz2JBUyYY6JEpnzFIdm-xQ?pwd=rmlp)|
 
