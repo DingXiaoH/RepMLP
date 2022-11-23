@@ -2,7 +2,7 @@
 
 Accepted to CVPR-2022!
 
-The latest version: https://arxiv.org/abs/2112.11081
+The latest version: https://openaccess.thecvf.com/content/CVPR2022/papers/Ding_RepMLPNet_Hierarchical_Vision_MLP_With_Re-Parameterized_Locality_CVPR_2022_paper.pdf
 
 Compared to the old version, we no longer use RepMLP Block as a plug-in component in traditional ConvNets. Instead, we build an MLP architecture with RepMLP Block with a hierarchical design. RepMLPNet shows favorable performance, compared to the other vision MLP models including MLP-Mixer, ResMLP, gMLP, S2-MLP, etc. 
 
@@ -12,11 +12,12 @@ The overlap between the two versions is the Structural Re-parameterization metho
 
 Citation:
 
-    @article{ding2021repmlpnet,
-    title={RepMLPNet: Hierarchical Vision MLP with Re-parameterized Locality},
+    @inproceedings{ding2022repmlpnet,
+    title={Repmlpnet: Hierarchical vision mlp with re-parameterized locality},
     author={Ding, Xiaohan and Chen, Honghao and Zhang, Xiangyu and Han, Jungong and Ding, Guiguang},
-    journal={arXiv preprint arXiv:2112.11081},
-    year={2021}
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+    pages={578--587},
+    year={2022}
     }
 
 Old version: https://arxiv.org/abs/2105.01883
